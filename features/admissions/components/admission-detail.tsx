@@ -3,9 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BedDouble } from "lucide-react";
+import { BedDouble, Slice } from "lucide-react";
 import useSWR from "swr";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
@@ -41,24 +42,36 @@ export function AdmissionDetail() {
   }
 
   const canDischarge = can({ role: user?.role }, PERMISSIONS.admissionDischarge);
+  const canScheduleSurgery = can({ role: user?.role }, PERMISSIONS.surgeryManage);
   const isAdmitted = admission.status === "ADMITTED";
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Admission #{admission.id}</h1>
-          <WorkflowStatusBadge status={admission.status} />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="grid gap-2">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-semibold tracking-tight">Admission #{admission.id}</h1>
+            <WorkflowStatusBadge status={admission.status} />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            <Link
+              href={`/patients/${admission.patient_id}`}
+              className="underline-offset-4 hover:text-primary hover:underline"
+            >
+              Patient #{admission.patient_id}
+            </Link>{" "}
+            · {admission.ward?.name ?? "—"} · bed {admission.bed_number ?? "—"}
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          <Link
-            href={`/patients/${admission.patient_id}`}
-            className="underline-offset-4 hover:text-primary hover:underline"
+        {isAdmitted && canScheduleSurgery ? (
+          <Button
+            variant="outline"
+            render={<Link href={`/surgeries/new?patient_id=${admission.patient_id}`} />}
           >
-            Patient #{admission.patient_id}
-          </Link>{" "}
-          · {admission.ward?.name ?? "—"} · bed {admission.bed_number ?? "—"}
-        </p>
+            <Slice className="size-4" />
+            Schedule surgery
+          </Button>
+        ) : null}
       </div>
 
       <Card>

@@ -1,15 +1,18 @@
-﻿import { RoutePlaceholder } from "@/components/shared/route-placeholder"
+﻿import { PageHeader } from "@/components/shared/page-header";
+import { SurgeriesTable } from "@/features/surgeries/components/surgeries-table";
 
 export const metadata = {
   title: "Surgeries",
-}
+};
 
-export default function Page() {
+export default function SurgeriesPage() {
   return (
-    <RoutePlaceholder
-      title="Surgeries"
-      description="Schedule and track the surgery workflow."
-      phase="the inpatient and surgery workflow phase"
-    />
-  )
+    <div className="grid gap-6">
+      <PageHeader
+        title="Surgeries"
+        description="Schedule operations and track them through start, completion and cancellation."
+      />
+      <SurgeriesTable />
+    </div>
+  );
 }
