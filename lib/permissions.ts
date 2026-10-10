@@ -44,6 +44,8 @@ export const PERMISSIONS = {
   userView: "user:view",
   userManage: "user:manage",
   auditView: "audit:view",
+  recycleBinView: "recyclebin:read",
+  recycleBinRestore: "recyclebin:restore",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -66,6 +68,8 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.userView,
     PERMISSIONS.userManage,
     PERMISSIONS.auditView,
+    PERMISSIONS.recycleBinView,
+    PERMISSIONS.recycleBinRestore,
   ],
   REGISTRAR: [
     PERMISSIONS.dashboardView,

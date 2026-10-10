@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Stethoscope,
   Syringe,
+  Trash2,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -118,6 +119,12 @@ export const NAV_SECTIONS: NavSection[] = [
         href: "/audit-logs",
         icon: ScrollText,
         permission: PERMISSIONS.auditView,
+      },
+      {
+        title: "Recycle bin",
+        href: "/recycle-bin",
+        icon: Trash2,
+        permission: PERMISSIONS.recycleBinView,
       },
     ],
   },

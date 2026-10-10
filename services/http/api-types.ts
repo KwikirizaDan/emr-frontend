@@ -317,3 +317,21 @@ export type FollowupWorklistItem = {
 
 /** Dashboard summary counts. Deliberately open: render only returned keys. */
 export type DashboardData = Record<string, unknown>;
+
+// ---------------------------------------------------------------------------
+// Recycle bin (admin)
+// ---------------------------------------------------------------------------
+
+export type RecycleBinEntityType = "patient" | "encounter" | "diagnosis" | "user";
+
+export type RecycleBinItem = {
+  entity_type: RecycleBinEntityType;
+  id: number;
+  label: string;
+  patient_id: number | null;
+  deleted_at: string;
+  deleted_by_id: number | null;
+  delete_reason: string | null;
+  /** The full soft-deleted row, as returned by the API. */
+  record: Record<string, unknown>;
+};
