@@ -1,3 +1,6 @@
+/**
+ * New follow-up route: schedules a future review appointment.
+ */
 import { Suspense } from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -8,6 +11,9 @@ export const metadata = {
   title: "Book follow-up",
 };
 
+/**
+ * Renders the follow-up booking form.
+ */
 export default function NewFollowupPage() {
   return (
     <div className="grid max-w-3xl gap-6">

@@ -1,3 +1,4 @@
+/** Surgery record view with start, complete and cancel actions. */
 "use client";
 
 import * as React from "react";
@@ -28,6 +29,7 @@ import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatDateTime } from "@/lib/date";
 import { isApiError } from "@/services/http/api-error";
 
+/** Loads the surgery by route id and exposes its lifecycle actions. */
 export function SurgeryDetail() {
   const params = useParams<{ surgeryId: string }>();
   const surgeryId = params.surgeryId;
@@ -198,6 +200,7 @@ export function SurgeryDetail() {
   );
 }
 
+/** Read-only label/value pair used in the detail cards. */
 function Detail({ label, value, className }: { label: string; value: string; className?: string }) {
   return (
     <div className={className ? `grid gap-0.5 ${className}` : "grid gap-0.5"}>
@@ -207,6 +210,7 @@ function Detail({ label, value, className }: { label: string; value: string; cla
   );
 }
 
+/** Inline form that records outcome notes and completes the surgery. */
 function CompleteForm({
   surgeryId,
   onCompleted,

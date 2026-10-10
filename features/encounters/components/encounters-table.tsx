@@ -1,3 +1,4 @@
+// Encounter register: server-backed table with status filtering and pagination.
 "use client";
 
 import * as React from "react";
@@ -17,6 +18,7 @@ import { humanizeEnum } from "@/lib/formatters";
 import useSWR from "swr";
 import type { Encounter } from "@/services/http/api-types";
 
+/** Encounter register table with a status filter, pagination and a create action. */
 export function EncountersTable() {
   const { user } = useCurrentUser();
   const [status, setStatus] = React.useState<"" | "OPEN" | "CLOSED">("");

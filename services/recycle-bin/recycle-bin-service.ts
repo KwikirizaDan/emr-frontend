@@ -21,10 +21,12 @@ export type RecycleBinFilters = {
 };
 
 export const recycleBinService = {
+  /** List soft deleted records, newest first, optionally filtered by entity type. */
   list(filters: RecycleBinFilters = {}): Promise<Paginated<RecycleBinItem>> {
     return getList<RecycleBinItem>("/recycle-bin", { ...filters });
   },
 
+  /** Restore one record. The route expects a JSON body, so always send one. */
   restore(
     entityType: RecycleBinEntityType,
     entityId: number,

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Client-side validation for staff accounts. */
 
+/** Roles a staff account can hold. */
 export const USER_ROLES = ["ADMIN", "REGISTRAR", "NURSE", "DOCTOR", "SURGEON"] as const;
 
 const base = z.object({

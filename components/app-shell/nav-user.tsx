@@ -1,3 +1,4 @@
+/** Sidebar footer user menu showing the current identity and sign-out action. */
 "use client";
 
 import * as React from "react";
@@ -19,10 +20,12 @@ import { roleLabel } from "@/components/app-shell/app-sidebar";
 import { initials } from "@/lib/formatters";
 import type { CurrentUser } from "@/features/auth/hooks/use-current-user";
 
+/** Renders the signed-in identity, or a skeleton while the session is loading. */
 export function NavUser({ user }: { user: CurrentUser | null }) {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = React.useState(false);
 
+  /** Ends the session server-side, then returns the user to the sign-in screen. */
   async function signOut() {
     setIsSigningOut(true);
     try {

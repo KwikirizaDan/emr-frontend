@@ -1,3 +1,6 @@
+/**
+ * Schedule surgery route: book a theatre slot for an admitted patient.
+ */
 import { Suspense } from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -8,6 +11,9 @@ export const metadata = {
   title: "Schedule surgery",
 };
 
+/**
+ * Renders the surgery scheduling form.
+ */
 export default function NewSurgeryPage() {
   return (
     <div className="grid max-w-3xl gap-6">

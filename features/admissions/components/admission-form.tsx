@@ -1,3 +1,4 @@
+// Admits a patient: choose the patient, the justifying encounter and a free bed.
 "use client";
 
 import * as React from "react";
@@ -76,6 +77,7 @@ export function AdmissionForm() {
       setFormError("Select a patient before admitting.");
       return;
     }
+    // Only doctors and surgeons may be recorded as the admitting doctor.
     const canBeDoctor = user?.role === "DOCTOR" || user?.role === "SURGEON";
     try {
       const admission = await admissionService.create({

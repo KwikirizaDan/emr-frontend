@@ -1,3 +1,9 @@
+/**
+ * Request gate for page routes.
+ *
+ * Cookie-presence redirect only; see `proxy` for why it is not a security
+ * boundary.
+ */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 

@@ -1,5 +1,12 @@
+/**
+ * Server-only environment configuration.
+ *
+ * Accessors are lazy and validated so a missing variable fails at first use
+ * with an actionable message rather than at import time during a build.
+ */
 import "server-only";
 
+/** Reads an env var, treating missing or blank values as unset. */
 function read(name: string): string | undefined {
   const value = process.env[name];
   return value && value.trim() !== "" ? value.trim() : undefined;

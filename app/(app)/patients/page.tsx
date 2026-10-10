@@ -1,10 +1,16 @@
-﻿import { PageHeader } from "@/components/shared/page-header";
+﻿/**
+ * Patient register route: search and manage patient records.
+ */
+import { PageHeader } from "@/components/shared/page-header";
 import { PatientsTable } from "@/features/patients/components/patients-table";
 
 export const metadata = {
   title: "Patients",
 };
 
+/**
+ * Renders the patient register and search.
+ */
 export default function PatientsPage() {
   return (
     <div className="grid gap-6">

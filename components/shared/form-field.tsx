@@ -1,14 +1,17 @@
+/** Labelled form field with description, error message and accessible wiring. */
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
+/** Props injected into a field's control by {@link FormField}. */
 export type FormControlProps = {
   id: string;
   "aria-describedby": string | undefined;
   "aria-invalid": boolean;
 };
 
+/** Props accepted by {@link FormField}. */
 export type FormFieldProps = {
   label: string;
   /** Unique id; used to link label, description and error to the control. */

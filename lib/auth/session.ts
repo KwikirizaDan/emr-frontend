@@ -1,3 +1,9 @@
+/**
+ * Encrypted session cookie codec.
+ *
+ * Seals the session with AES-256-GCM so the browser can neither read nor forge
+ * it. Server-only: the key is derived from `SESSION_SECRET`.
+ */
 import "server-only";
 
 import {
@@ -22,6 +28,7 @@ const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 
 export const SESSION_COOKIE_NAME = COOKIE_NAME;
 
+/** Cookie max-age: remaining refresh-token life, clamped to a sane range. */
 function remainingLifetime(payload: SessionPayload): number {
   const expiry = payload.refreshTokenExpiresAt ?? readTokenExpiry(payload.refreshToken);
   if (!expiry) return SESSION_MAX_AGE_SECONDS;
@@ -122,6 +129,7 @@ export function readTokenExpiry(token: string): number | null {
   }
 }
 
+/** True when the access token is expired or inside the clock-skew window. */
 export function isAccessTokenExpired(payload: SessionPayload): boolean {
   const nowSeconds = Math.floor(Date.now() / 1000);
   const expiry = payload.accessTokenExpiresAt ?? readTokenExpiry(payload.accessToken);
@@ -129,6 +137,7 @@ export function isAccessTokenExpired(payload: SessionPayload): boolean {
   return expiry - env.tokenSkewSeconds <= nowSeconds;
 }
 
+/** True when the refresh token is expired or inside the clock-skew window. */
 export function isRefreshTokenExpired(payload: SessionPayload): boolean {
   const nowSeconds = Math.floor(Date.now() / 1000);
   const expiry = payload.refreshTokenExpiresAt ?? readTokenExpiry(payload.refreshToken);
@@ -144,6 +153,7 @@ export type SessionCookieOptions = {
   maxAge: number;
 };
 
+/** Cookie flags for writing a session; maxAge tracks token lifetime. */
 export function sessionCookieOptions(payload?: SessionPayload): SessionCookieOptions {
   return {
     httpOnly: true,
@@ -154,6 +164,7 @@ export function sessionCookieOptions(payload?: SessionPayload): SessionCookieOpt
   };
 }
 
+/** Cookie flags for clearing the session immediately. */
 export function clearedSessionCookieOptions() {
   return { ...sessionCookieOptions(), maxAge: 0 };
 }

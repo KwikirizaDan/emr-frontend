@@ -1,3 +1,7 @@
+/**
+ * Public "access denied" route shown when the signed-in user lacks the role
+ * required for a page.
+ */
 import { Lock } from "lucide-react";
 
 import { EmptyState } from "@/components/shared/empty-state";
@@ -7,6 +11,9 @@ export const metadata = {
   title: "Access denied",
 };
 
+/**
+ * Explains that the current role cannot view the requested area.
+ */
 export default function UnauthorizedPage() {
   return (
     <div className="mx-auto w-full max-w-2xl py-12">

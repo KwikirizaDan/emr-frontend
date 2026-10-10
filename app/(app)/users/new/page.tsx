@@ -1,3 +1,6 @@
+/**
+ * New user route: create a staff account with a temporary password.
+ */
 import { PageHeader } from "@/components/shared/page-header";
 import { UserForm } from "@/features/users/components/user-form";
 
@@ -5,6 +8,9 @@ export const metadata = {
   title: "New account",
 };
 
+/**
+ * Renders the create-account form.
+ */
 export default function NewUserPage() {
   return (
     <div className="grid max-w-3xl gap-6">

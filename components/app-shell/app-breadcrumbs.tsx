@@ -1,3 +1,4 @@
+/** Breadcrumb trail derived from the current route. */
 "use client";
 
 import Link from "next/link";
@@ -27,6 +28,7 @@ const SEGMENT_TITLES: Record<string, string> = {
   "audit-logs": "Audit logs",
 };
 
+/** Maps a URL segment to a display label, falling back to a spaced title. */
 function titleForSegment(segment: string): string {
   return SEGMENT_TITLES[segment] ?? segment.replace(/-/g, " ");
 }

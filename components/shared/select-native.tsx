@@ -1,3 +1,4 @@
+/** Native select control styled with the shared design tokens. */
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

@@ -1,3 +1,4 @@
+/** Books a follow-up appointment for a patient. */
 "use client";
 
 import * as React from "react";
@@ -43,6 +44,7 @@ export function FollowupForm() {
     patientService.getById(patientIdParam as string),
   );
 
+  // Doctors and surgeons default themselves as the responsible clinician.
   const canBeClinician = user?.role === "DOCTOR" || user?.role === "SURGEON";
 
   const {

@@ -18,6 +18,7 @@ const optionalText = (max: number) =>
     .optional()
     .transform((value) => (value && value.trim() !== "" ? value.trim() : ""));
 
+/** Zod schema for the patient registration/edit form. */
 export const patientFormSchema = z.object({
   first_name: z
     .string()
@@ -55,7 +56,9 @@ export const patientFormSchema = z.object({
     .optional(),
 });
 
+/** Raw form values accepted by react-hook-form, before zod transforms run. */
 export type PatientFormValues = z.input<typeof patientFormSchema>;
+/** Parsed form values after transforms (trimmed strings, empty fields dropped). */
 export type PatientFormOutput = z.output<typeof patientFormSchema>;
 
 /** Converts validated form values into the Flask request payload (empty → null). */

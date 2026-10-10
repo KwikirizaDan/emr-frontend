@@ -1,3 +1,7 @@
+/**
+ * Public sign-in route. Renders the credential form inside a suspense
+ * boundary so its client hooks load lazily.
+ */
 import { Suspense } from "react";
 import { Stethoscope } from "lucide-react";
 
@@ -8,6 +12,9 @@ export const metadata = {
   title: "Sign in",
 };
 
+/**
+ * Centered sign-in screen; credentials are submitted to the login API route.
+ */
 export default function LoginPage() {
   return (
     <main className="flex min-h-svh flex-col items-center justify-center bg-background p-4">

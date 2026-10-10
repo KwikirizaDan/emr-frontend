@@ -1,3 +1,4 @@
+/** Worklist of follow-ups due within a date range. */
 "use client";
 
 import * as React from "react";
@@ -18,10 +19,12 @@ import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatDateTime, toDateInputValue } from "@/lib/date";
 import type { FollowupWorklistItem } from "@/services/http/api-types";
 
+/** Returns an ISO date string for today plus the given number of days. */
 function plusDays(days: number): string {
   return toDateInputValue(new Date(Date.now() + days * 24 * 60 * 60 * 1000));
 }
 
+/** Upcoming follow-ups within the selected date range. */
 export function FollowupsWorklist() {
   const { user } = useCurrentUser();
   const [dateFrom, setDateFrom] = React.useState(plusDays(0));

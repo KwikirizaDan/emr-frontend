@@ -1,3 +1,4 @@
+/** Searchable, server-backed patient picker used across clinical forms. */
 "use client";
 
 import * as React from "react";
@@ -29,6 +30,7 @@ export function PatientPicker({ id = "patient-picker", value, onChange, disabled
   const [term, setTerm] = React.useState("");
   const [debounced, setDebounced] = React.useState("");
 
+  // Debounce typing so the server search runs only after the user pauses.
   React.useEffect(() => {
     const handle = setTimeout(() => setDebounced(term.trim()), 250);
     return () => clearTimeout(handle);

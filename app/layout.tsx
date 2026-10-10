@@ -1,3 +1,7 @@
+/**
+ * Root document layout. Loads the app fonts, wraps children in the theme and
+ * query providers, and defines the default metadata template.
+ */
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Merriweather } from "next/font/google";
 
@@ -30,6 +34,9 @@ export const metadata: Metadata = {
     "Clinical workspace for patient registration, encounters, admissions, surgery and follow-up.",
 };
 
+/**
+ * Applies the shared html/body shell, font variables and providers to every route.
+ */
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning className={cn("antialiased", fontSans.variable)}>

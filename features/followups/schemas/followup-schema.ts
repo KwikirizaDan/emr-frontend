@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Client-side validation for booking a follow-up appointment. */
 
+/** The scheduled time must be in the future; the clinician is optional. */
 export const followUpFormSchema = z.object({
   clinicPatientId: z.string().min(1, "Select a patient"),
   scheduled_at: z

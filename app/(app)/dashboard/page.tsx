@@ -1,3 +1,6 @@
+/**
+ * Dashboard route: a read-only operational overview for the current day.
+ */
 import { CalendarDays } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -11,6 +14,10 @@ export const metadata = {
   title: "Dashboard",
 };
 
+/**
+ * Renders today's summary metrics and work panels; child components fetch their
+ * own data within the signed-in user's permissions.
+ */
 export default function DashboardPage() {
   return (
     <div className="grid gap-6">

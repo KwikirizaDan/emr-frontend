@@ -5,6 +5,7 @@ import { z } from "zod";
 const futureOrNow = (value: string) =>
   value.trim() !== "" && !Number.isNaN(new Date(value).getTime());
 
+/** Scheduling requires the end time to fall after the start time. */
 export const scheduleSurgerySchema = z
   .object({
     clinicPatientId: z.string().min(1, "Select a patient"),

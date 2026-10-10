@@ -20,6 +20,7 @@ export type UserPayload = {
   is_active?: boolean;
 };
 
+/** Admin user account management. */
 export const userService = {
   list(filters: UserFilters = {}): Promise<Paginated<User>> {
     return getList<User>("/users", { ...filters });

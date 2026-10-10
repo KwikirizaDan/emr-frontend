@@ -1,3 +1,6 @@
+/**
+ * New encounter route: opens a consultation record for a patient.
+ */
 import { Suspense } from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -8,6 +11,9 @@ export const metadata = {
   title: "New encounter",
 };
 
+/**
+ * Renders the encounter form; the patient is chosen within the form.
+ */
 export default function NewEncounterPage() {
   return (
     <div className="grid max-w-3xl gap-6">

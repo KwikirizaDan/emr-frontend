@@ -1,3 +1,4 @@
+/** Dashboard summary cards and operational work panels. */
 "use client";
 
 import * as React from "react";

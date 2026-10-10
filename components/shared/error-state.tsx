@@ -1,3 +1,4 @@
+/** Error surface for failed data loads, with an optional retry action. */
 "use client";
 
 import * as React from "react";
@@ -14,6 +15,7 @@ export type ErrorStateProps = {
   className?: string;
 };
 
+/** Turns an unknown error into a safe user-facing message and support reference. */
 function describe(error: unknown): { message: string; requestId: string | null } {
   const apiError = error as Partial<ApiError> | undefined;
   const status = apiError?.status;

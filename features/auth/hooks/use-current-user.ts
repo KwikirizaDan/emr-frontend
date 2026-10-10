@@ -1,3 +1,4 @@
+/** Hook exposing the currently signed-in user. */
 import useSWR from "swr";
 
 import { bffRequest } from "@/services/http/bff-client";

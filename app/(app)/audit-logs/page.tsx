@@ -1,10 +1,16 @@
-﻿import { PageHeader } from "@/components/shared/page-header";
+﻿/**
+ * Audit log route: read-only traceability of recorded system activity.
+ */
+import { PageHeader } from "@/components/shared/page-header";
 import { AuditTable } from "@/features/audit/components/audit-table";
 
 export const metadata = {
   title: "Audit logs",
 };
 
+/**
+ * Renders the audit log table; visibility is governed by the backend.
+ */
 export default function AuditLogsPage() {
   return (
     <div className="grid gap-6">

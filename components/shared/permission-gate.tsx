@@ -1,3 +1,4 @@
+/** Client-side permission helpers for hiding controls the current role cannot use. */
 import * as React from "react";
 import { Lock } from "lucide-react";
 

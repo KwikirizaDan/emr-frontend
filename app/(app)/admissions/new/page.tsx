@@ -1,3 +1,6 @@
+/**
+ * New admission route: assign a patient to a free bed.
+ */
 import { Suspense } from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -8,6 +11,9 @@ export const metadata = {
   title: "Admit patient",
 };
 
+/**
+ * Renders the admission form.
+ */
 export default function NewAdmissionPage() {
   return (
     <div className="grid max-w-3xl gap-6">

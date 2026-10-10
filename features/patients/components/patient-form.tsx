@@ -1,3 +1,4 @@
+// Create/edit form for a patient record, shared by the register and edit pages.
 "use client";
 
 import * as React from "react";
@@ -26,6 +27,7 @@ type PatientFormProps = {
   patient?: Patient;
 };
 
+/** Patient registration/edit form, prefilled from `patient` when editing. */
 export function PatientForm({ patient }: PatientFormProps) {
   const router = useRouter();
   const [formError, setFormError] = React.useState<string | null>(null);
@@ -67,6 +69,7 @@ export function PatientForm({ patient }: PatientFormProps) {
       router.refresh();
     } catch (error) {
       if (isApiError(error) && error.isConflict) {
+        // Conflict means a matching record exists; link to it instead of a generic error.
         const existing = error.details?.existing_patient_id;
         setDuplicateId(typeof existing === "number" ? existing : null);
         setFormError(error.message);

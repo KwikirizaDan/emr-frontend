@@ -1,3 +1,6 @@
+/**
+ * New encounter route scoped to a patient, preselected from the URL segment.
+ */
 import { Suspense } from "react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -8,6 +11,9 @@ export const metadata = {
   title: "New encounter",
 };
 
+/**
+ * Resolves the patient id from the route and opens a new encounter for them.
+ */
 export default async function NewPatientEncounterPage({
   params,
 }: {

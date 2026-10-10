@@ -1,3 +1,4 @@
+// Server-state hook backing the patient register table.
 import useSWR from "swr";
 
 import { patientService, type PatientFilters } from "@/services/patients/patient-service";
@@ -8,6 +9,7 @@ const DEFAULT_FILTERS: Required<Pick<PatientFilters, "page" | "per_page">> = {
   per_page: 20,
 };
 
+/** Builds the SWR cache key from the active filters, applying pagination defaults. */
 function buildKey(filters: PatientFilters): string {
   const params = new URLSearchParams();
   if (filters.q) params.set("q", filters.q);

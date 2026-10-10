@@ -17,9 +17,11 @@ export type WorklistPage = {
   per_page?: number;
 };
 
+/** Dashboard summary and the three worklist tabs. */
 export const worklistService = {
   dashboard(): Promise<DashboardData> {
     return bffRequest<DashboardData>("/dashboard").then((response) => {
+      // Unwrap the envelope and default to an empty summary, never fake counts.
       const data = (response as { data?: DashboardData }).data;
       return data && typeof data === "object" ? data : {};
     });

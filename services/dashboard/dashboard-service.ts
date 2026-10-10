@@ -1,3 +1,8 @@
+/**
+ * Server-only dashboard data access.
+ *
+ * Kept behind the BFF so the raw Flask envelope never leaks to the browser.
+ */
 import "server-only";
 
 import { ENDPOINTS } from "@/services/http/endpoints";

@@ -1,3 +1,4 @@
+/** Day-based theatre worklist of scheduled surgeries. */
 "use client";
 
 import * as React from "react";
@@ -18,6 +19,7 @@ import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatTime, todayKey } from "@/lib/date";
 import type { SurgeryWorklistItem } from "@/services/http/api-types";
 
+/** Theatre worklist for a selected day. */
 export function SurgeriesWorklist() {
   const { user } = useCurrentUser();
   const [day, setDay] = React.useState(todayKey());

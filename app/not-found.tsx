@@ -1,9 +1,15 @@
+/**
+ * Global 404 page rendered by the App Router for unmatched routes.
+ */
 import Link from "next/link";
 import { Compass } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 
+/**
+ * Renders the shared empty state with a single route back to the dashboard.
+ */
 export default function NotFound() {
   return (
     <main className="flex min-h-svh flex-col items-center justify-center bg-background p-4">

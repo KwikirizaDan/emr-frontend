@@ -1,3 +1,4 @@
+// Discharge form used within the admission detail page.
 "use client";
 
 import * as React from "react";

@@ -1,3 +1,4 @@
+// Read-only summary card for a patient's demographic details.
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatAge, formatDate } from "@/lib/date";
 import { formatMrn, formatPhone, formatSex } from "@/lib/formatters";

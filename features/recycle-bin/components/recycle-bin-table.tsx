@@ -1,3 +1,4 @@
+/** Admin-only list of soft-deleted records that can be restored. */
 "use client";
 
 import * as React from "react";
@@ -39,6 +40,14 @@ const TYPE_FILTERS: { value: "" | RecycleBinEntityType; label: string }[] = [
   { value: "user", label: "Users" },
 ];
 
+/**
+ * Admin-only view of every soft deleted record — patients, encounters,
+ * diagnoses and users — newest deletion first.
+ *
+ * A row can be inspected as raw JSON or restored. Restoring writes a RESTORE
+ * entry to the API audit log. Visibility is gated by `recyclebin:read` and the
+ * restore control by `recyclebin:restore`; Flask still authorises every call.
+ */
 export function RecycleBinTable() {
   const { user } = useCurrentUser();
   const [entityType, setEntityType] = React.useState<"" | RecycleBinEntityType>("");
@@ -52,6 +61,8 @@ export function RecycleBinTable() {
   const canView = can({ role: user?.role }, PERMISSIONS.recycleBinView);
   const canRestore = can({ role: user?.role }, PERMISSIONS.recycleBinRestore);
 
+  // The SWR key doubles as the cache identity: a filter or page change is a new
+  // key. Passing null when unpermitted skips the request entirely.
   const { data, error, isLoading, mutate } = useSWR(
     canView ? `/recycle-bin?type=${entityType}&page=${page}&per_page=${perPage}` : null,
     () =>
@@ -225,6 +236,7 @@ export function RecycleBinTable() {
   );
 }
 
+/** Read-only dialog showing a deleted row's metadata and its stored JSON record. */
 function RecycleBinDetailsDialog({
   item,
   onClose,

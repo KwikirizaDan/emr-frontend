@@ -1,3 +1,4 @@
+/** Paginated, status-filterable list of surgeries. */
 "use client";
 
 import * as React from "react";
@@ -18,6 +19,7 @@ import type { Surgery } from "@/services/http/api-types";
 
 const STATUSES = ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED"] as const;
 
+/** Lists surgeries with a status filter and permission-gated scheduling. */
 export function SurgeriesTable() {
   const { user } = useCurrentUser();
   const [status, setStatus] = React.useState<"" | (typeof STATUSES)[number]>("");

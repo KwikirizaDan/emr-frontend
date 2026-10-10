@@ -1,3 +1,4 @@
+// Inline form for adding a diagnosis within the encounter detail page.
 "use client";
 
 import * as React from "react";

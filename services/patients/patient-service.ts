@@ -31,6 +31,7 @@ export type PatientPayload = {
   next_of_kin_phone?: string | null;
 };
 
+/** CRUD, soft-delete and timeline calls for patients. */
 export const patientService = {
   list(filters: PatientFilters = {}): Promise<Paginated<Patient>> {
     return getList<Patient>("/patients", { ...filters });

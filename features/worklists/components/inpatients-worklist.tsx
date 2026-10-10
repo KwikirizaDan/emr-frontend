@@ -1,3 +1,4 @@
+/** Worklist of patients currently admitted. */
 "use client";
 
 import * as React from "react";
@@ -15,6 +16,7 @@ import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatDateTime } from "@/lib/date";
 import type { InpatientWorklistItem } from "@/services/http/api-types";
 
+/** Current inpatient census with ward and bed location. */
 export function InpatientsWorklist() {
   const { user } = useCurrentUser();
   const [page, setPage] = React.useState(1);

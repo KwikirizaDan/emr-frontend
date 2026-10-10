@@ -1,3 +1,4 @@
+/** Username/password sign-in form. */
 "use client";
 
 import * as React from "react";
@@ -18,6 +19,7 @@ function safeNextPath(value: string | null): string {
   return value;
 }
 
+/** Sign-in form that posts credentials to the auth route, then redirects. */
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();

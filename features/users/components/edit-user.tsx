@@ -1,3 +1,4 @@
+/** Loads a staff account and renders the prefilled edit form. */
 "use client";
 
 import { useParams } from "next/navigation";

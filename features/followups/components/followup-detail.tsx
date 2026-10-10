@@ -1,3 +1,4 @@
+/** Follow-up record view with complete, mark-missed and cancel actions. */
 "use client";
 
 import * as React from "react";
@@ -22,6 +23,7 @@ import { isApiError } from "@/services/http/api-error";
 
 type ClosableStatus = "CANCELLED" | "MISSED";
 
+/** Loads the follow-up by route id and exposes its status actions. */
 export function FollowupDetail() {
   const params = useParams<{ followUpId: string }>();
   const followUpId = params.followUpId;
@@ -181,6 +183,7 @@ export function FollowupDetail() {
   );
 }
 
+/** Read-only label/value pair used in the detail card. */
 function Detail({ label, value, className }: { label: string; value: string; className?: string }) {
   return (
     <div className={className ? `grid gap-0.5 ${className}` : "grid gap-0.5"}>

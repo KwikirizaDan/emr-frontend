@@ -1,3 +1,4 @@
+/** Role-aware navigation model that drives the application sidebar. */
 import {
   BedDouble,
   CalendarClock,

@@ -1,3 +1,4 @@
+/** Create or edit a staff account. */
 "use client";
 
 import * as React from "react";

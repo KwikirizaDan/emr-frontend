@@ -1,3 +1,4 @@
+// Chronological timeline of a patient's clinical activity.
 "use client";
 
 import * as React from "react";
@@ -20,6 +21,7 @@ import { patientService } from "@/services/patients/patient-service";
 import { formatDateTime } from "@/lib/date";
 import type { TimelineEvent } from "@/services/http/api-types";
 
+/** Maps a timeline event type to its display icon; unknown types fall back to a document. */
 const EVENT_ICONS: Record<string, LucideIcon> = {
   ENCOUNTER: FileText,
   ADMISSION: BedDouble,
@@ -62,6 +64,7 @@ export function PatientTimeline({ patientId }: { patientId: string | number }) {
   );
 }
 
+/** Renders a single timeline entry with its icon, status and trimmed detail list. */
 function TimelineItem({ event }: { event: TimelineEvent }) {
   const Icon = EVENT_ICONS[event.type] ?? FileText;
   const details = Object.entries(event.details).filter(
@@ -98,6 +101,7 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
   );
 }
 
+/** Formats an arbitrary timeline detail value for compact inline display. */
 function formatDetail(value: unknown): string {
   if (value === null || value === undefined) return "—";
   if (typeof value === "string" || typeof value === "number") return String(value);

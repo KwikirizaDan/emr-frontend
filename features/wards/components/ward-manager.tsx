@@ -1,3 +1,4 @@
+// Ward and bed administration screen for hospital administrators.
 "use client";
 
 import * as React from "react";
@@ -68,6 +69,7 @@ export function WardManager() {
   );
 }
 
+/** Compact form for creating a new ward. */
 function CreateWardForm({ onCreated }: { onCreated: () => void | Promise<void> }) {
   const [formError, setFormError] = React.useState<string | null>(null);
   const {
@@ -126,6 +128,7 @@ function CreateWardForm({ onCreated }: { onCreated: () => void | Promise<void> }
   );
 }
 
+/** Displays one ward with its beds and, for managers, an inline add-bed control. */
 function WardCard({
   ward,
   canManage,

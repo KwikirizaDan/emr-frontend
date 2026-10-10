@@ -1,3 +1,4 @@
+// Route component that loads a patient record and renders the prefilled edit form.
 "use client";
 
 import { useParams } from "next/navigation";

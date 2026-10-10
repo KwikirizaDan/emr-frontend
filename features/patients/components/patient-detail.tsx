@@ -1,3 +1,4 @@
+// Patient profile page: header actions plus overview and timeline tabs.
 "use client";
 
 import * as React from "react";
@@ -19,6 +20,7 @@ import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatMrn, formatPersonDisplayName, formatSex } from "@/lib/formatters";
 import { formatAge, formatDate } from "@/lib/date";
 
+/** Patient profile with permission-gated quick actions and clinical tabs. */
 export function PatientDetail() {
   const params = useParams<{ patientId: string }>();
   const patientId = params.patientId;

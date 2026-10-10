@@ -39,9 +39,11 @@ export type DischargePayload = {
   instructions?: string | null;
 };
 
+/** Ward listing and bed management. */
 export const wardService = {
   list(): Promise<WardWithBeds[]> {
     return bffRequest<WardWithBeds[]>("/wards").then((response) => {
+      // The endpoint has returned both a bare array and a `data` envelope.
       const data = (response as { data?: WardWithBeds[] }).data;
       return Array.isArray(data) ? data : [];
     });
@@ -59,6 +61,7 @@ export const wardService = {
   },
 };
 
+/** Admission listing, creation and discharge. */
 export const admissionService = {
   list(filters: AdmissionFilters = {}): Promise<Paginated<AdmissionDetail>> {
     return getList<AdmissionDetail>("/admissions", { ...filters });

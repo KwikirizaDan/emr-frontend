@@ -1,3 +1,4 @@
+// Patient register: server-backed table with search, pagination and soft delete.
 "use client";
 
 import * as React from "react";
@@ -19,6 +20,7 @@ import { patientService } from "@/services/patients/patient-service";
 import type { Patient } from "@/services/http/api-types";
 import { isApiError } from "@/services/http/api-error";
 
+/** Patient register table with debounced search, pagination and permission-gated actions. */
 export function PatientsTable() {
   const { user } = useCurrentUser();
   const [term, setTerm] = React.useState("");
@@ -30,6 +32,7 @@ export function PatientsTable() {
   const [reasonError, setReasonError] = React.useState<string | null>(null);
   const [deleting, setDeleting] = React.useState(false);
 
+  // Debounce typing so the register is queried only after the user pauses.
   React.useEffect(() => {
     const handle = setTimeout(() => {
       setQuery(term.trim());

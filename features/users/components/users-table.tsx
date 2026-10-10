@@ -1,3 +1,4 @@
+/** Staff account directory with edit, password reset and deactivation. */
 "use client";
 
 import * as React from "react";
@@ -20,6 +21,7 @@ import { humanizeEnum } from "@/lib/formatters";
 import { isApiError } from "@/services/http/api-error";
 import type { User } from "@/services/http/api-types";
 
+/** Lists staff accounts with role-gated management actions. */
 export function UsersTable() {
   const { user: currentUser } = useCurrentUser();
   const [page, setPage] = React.useState(1);

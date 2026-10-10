@@ -1,3 +1,4 @@
+/** Admin dialog for resetting a staff member's password. */
 "use client";
 
 import * as React from "react";

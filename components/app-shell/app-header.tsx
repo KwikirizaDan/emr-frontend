@@ -1,3 +1,4 @@
+/** Sticky application header holding the sidebar toggle and utility actions. */
 "use client";
 
 import { Bell, HelpCircle, PanelLeft } from "lucide-react";
@@ -7,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
+/** Top bar hosting the sidebar toggle and notification/help actions. */
 export function AppHeader() {
   const { toggleSidebar } = useSidebar();
 

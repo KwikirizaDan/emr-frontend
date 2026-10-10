@@ -1,4 +1,11 @@
-﻿import "server-only";
+﻿/**
+ * Server-only authentication service.
+ *
+ * Talks to Flask's auth endpoints and normalises raw responses into the
+ * encrypted session shape. Token details never reach the browser; the BFF route
+ * handlers persist the returned session.
+ */
+import "server-only";
 
 import { ENDPOINTS } from "@/services/http/endpoints";
 import { flaskRequest } from "@/services/http/api-client";
@@ -56,6 +63,7 @@ export type AuthResult =
   | { ok: true; session: SessionPayload }
   | { ok: false; error: ApiError };
 
+/** Normalises an epoch-seconds, epoch-milliseconds or ISO timestamp to seconds. */
 function coerceExpiry(value: number | string | undefined): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string") {
@@ -105,6 +113,7 @@ function refreshSession(refresh: RefreshResponse, previous: SessionPayload): Ses
   };
 }
 
+/** Login, refresh, logout and current-user calls against Flask. */
 export const authService = {
   /** Calls `POST /auth/login` and normalises the response into a session. */
   async login(input: LoginInput): Promise<AuthResult> {

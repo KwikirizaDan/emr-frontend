@@ -1,3 +1,4 @@
+// Encounter record: clinical detail, diagnoses and close/void actions.
 "use client";
 
 import * as React from "react";
@@ -24,6 +25,7 @@ import { humanizeEnum } from "@/lib/formatters";
 import { isApiError } from "@/services/http/api-error";
 import type { Diagnosis } from "@/services/http/api-types";
 
+/** Encounter record with its diagnoses, plus close and void actions. */
 export function EncounterDetail() {
   const params = useParams<{ encounterId: string }>();
   const encounterId = params.encounterId;
@@ -246,6 +248,7 @@ export function EncounterDetail() {
   );
 }
 
+/** Permission-gated button that voids an encounter after capturing an audit reason. */
 function VoidEncounterButton({ encounterId }: { encounterId: number }) {
   const [open, setOpen] = React.useState(false);
   const [reason, setReason] = React.useState("");

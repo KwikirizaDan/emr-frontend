@@ -1,3 +1,6 @@
+/**
+ * Register patient route: create a new patient record.
+ */
 import { PageHeader } from "@/components/shared/page-header";
 import { PatientForm } from "@/features/patients/components/patient-form";
 
@@ -5,6 +8,9 @@ export const metadata = {
   title: "Register patient",
 };
 
+/**
+ * Renders the patient registration form.
+ */
 export default function NewPatientPage() {
   return (
     <div className="grid max-w-3xl gap-6">

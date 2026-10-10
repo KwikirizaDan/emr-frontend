@@ -1,6 +1,8 @@
+/** Shared loading placeholders for detail views and summary sections. */
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
+/** Row-shaped skeleton list, announced politely to assistive technology. */
 export function LoadingState({
   label = "Loading…",
   rows = 5,
@@ -20,6 +22,7 @@ export function LoadingState({
   );
 }
 
+/** Grid of card-shaped skeletons for summary sections. */
 export function LoadingCards({ count = 4, className }: { count?: number; className?: string }) {
   return (
     <div className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", className)} role="status" aria-live="polite">

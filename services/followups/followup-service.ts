@@ -28,6 +28,7 @@ export type FollowUpStatusPayload = {
   reason?: string | null;
 };
 
+/** Follow-up scheduling and status changes. */
 export const followUpService = {
   list(filters: FollowUpFilters = {}): Promise<Paginated<FollowUp>> {
     return getList<FollowUp>("/followups", { ...filters });

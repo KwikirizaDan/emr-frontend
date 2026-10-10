@@ -1,3 +1,4 @@
+/** Server-side session read/write helpers backed by the encrypted cookie. */
 import "server-only";
 
 import { cookies } from "next/headers";

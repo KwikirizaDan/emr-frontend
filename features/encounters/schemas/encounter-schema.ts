@@ -2,6 +2,7 @@ import { z } from "zod";
 
 /** Client-side encounter and diagnosis validation (Flask re-validates). */
 
+/** Outpatient/emergency encounter creation form. */
 export const encounterFormSchema = z.object({
   clinicPatientId: z.string().min(1, "Select a patient"),
   encounter_type: z.enum(["OPD", "EMERGENCY"], {
@@ -14,8 +15,10 @@ export const encounterFormSchema = z.object({
   notes: z.string().max(10000).optional(),
 });
 
+/** Form values for creating an encounter. */
 export type EncounterFormValues = z.infer<typeof encounterFormSchema>;
 
+/** Clinical diagnosis recorded against an open encounter. */
 export const diagnosisFormSchema = z.object({
   description: z
     .string()
@@ -26,8 +29,10 @@ export const diagnosisFormSchema = z.object({
   certainty: z.enum(["PROVISIONAL", "CONFIRMED"]),
 });
 
+/** Form values for recording a diagnosis. */
 export type DiagnosisFormValues = z.infer<typeof diagnosisFormSchema>;
 
+/** Converts diagnosis form values to the API payload (blank code becomes null). */
 export function toDiagnosisPayload(values: DiagnosisFormValues) {
   return {
     description: values.description.trim(),

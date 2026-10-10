@@ -1,3 +1,4 @@
+/** Reusable server-driven data table with built-in loading, empty and error states. */
 "use client";
 
 import * as React from "react";
@@ -24,6 +25,7 @@ import { ErrorState } from "@/components/shared/error-state";
 import { cn } from "@/lib/utils";
 import type { PaginationMeta } from "@/services/http/api-types";
 
+/** Column definition for {@link DataTable}. */
 export type DataTableColumn<T> = {
   id: string;
   header: React.ReactNode;
@@ -32,6 +34,7 @@ export type DataTableColumn<T> = {
   headerClassName?: string;
 };
 
+/** Props accepted by {@link DataTable}. */
 export type DataTableProps<T> = {
   columns: DataTableColumn<T>[];
   rows: T[];

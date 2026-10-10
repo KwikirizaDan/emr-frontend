@@ -1,8 +1,10 @@
+/** Empty-state placeholder for lists and screens that contain no data. */
 import * as React from "react";
 import { Inbox } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+/** Props accepted by {@link EmptyState}. */
 export type EmptyStateProps = {
   title: string;
   description?: string;
@@ -12,6 +14,7 @@ export type EmptyStateProps = {
   className?: string;
 };
 
+/** Centered empty-state block with an icon, message and optional action. */
 export function EmptyState({
   title,
   description,

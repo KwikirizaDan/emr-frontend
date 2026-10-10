@@ -1,3 +1,4 @@
+/** Consistent page header: title, one-line description and primary actions. */
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

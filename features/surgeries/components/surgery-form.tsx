@@ -1,3 +1,4 @@
+/** Schedules a new surgery for an admitted patient. */
 "use client";
 
 import * as React from "react";
@@ -72,6 +73,7 @@ export function SurgeryForm() {
   function selectPatient(next: Patient | null) {
     setPatient(next);
     setValue("clinicPatientId", next ? String(next.id) : "", { shouldValidate: true });
+    // Admissions are patient-specific, so drop any previously selected one.
     setValue("admission_id", "");
   }
 

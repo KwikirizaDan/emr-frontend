@@ -1,3 +1,4 @@
+/** Filterable audit log viewer with a JSON detail dialog. */
 "use client";
 
 import * as React from "react";
@@ -42,8 +43,10 @@ const EMPTY_DRAFT: DraftFilters = {
   date_to: "",
 };
 
+/** Audit log viewer with draft filters applied only on submit. */
 export function AuditTable() {
   const { user } = useCurrentUser();
+  // Draft holds the form inputs; applied is what the request actually uses.
   const [draft, setDraft] = React.useState<DraftFilters>(EMPTY_DRAFT);
   const [applied, setApplied] = React.useState<DraftFilters>(EMPTY_DRAFT);
   const [page, setPage] = React.useState(1);
@@ -248,6 +251,7 @@ export function AuditTable() {
   );
 }
 
+/** Converts draft filter strings into the service's typed filter object. */
 function buildFilters(draft: DraftFilters): AuditFilters {
   return {
     action: draft.action.trim() || undefined,
@@ -259,6 +263,7 @@ function buildFilters(draft: DraftFilters): AuditFilters {
   };
 }
 
+/** Read-only dialog showing one audit entry's metadata and JSON snapshots. */
 function AuditDetailsDialog({ log, onClose }: { log: AuditLog | null; onClose: () => void }) {
   return (
     <Dialog
@@ -306,6 +311,7 @@ function AuditDetailsDialog({ log, onClose }: { log: AuditLog | null; onClose: (
   );
 }
 
+/** Renders a before/after JSON snapshot, or an em dash when absent. */
 function JsonBlock({ title, value }: { title: string; value: Record<string, unknown> | null }) {
   return (
     <div className="grid gap-1">
@@ -317,6 +323,7 @@ function JsonBlock({ title, value }: { title: string; value: Record<string, unkn
   );
 }
 
+/** Read-only label/value pair used in the audit detail dialog. */
 function Detail({
   label,
   value,

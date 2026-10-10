@@ -1,3 +1,4 @@
+/** Application shell layout: sidebar, header, breadcrumbs and content region. */
 "use client";
 
 import * as React from "react";
@@ -51,6 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Placeholder layout shown while the current user loads or a redirect is pending. */
 function ShellSkeleton() {
   return (
     <div className="flex min-h-svh">

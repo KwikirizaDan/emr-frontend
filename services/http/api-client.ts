@@ -1,3 +1,10 @@
+/**
+ * Server-only Flask HTTP client.
+ *
+ * Owns the single axios instance used for every backend call, plus the shared
+ * query serialisation and error normalisation. Access tokens are supplied per
+ * request; nothing is cached here.
+ */
 import "server-only";
 
 import axios, { type AxiosHeaders, type AxiosInstance } from "axios";
@@ -6,6 +13,7 @@ import { env } from "@/lib/env";
 import { ApiError, parseErrorEnvelope } from "@/services/http/api-error";
 import { API_BASE_PATH } from "@/services/http/endpoints";
 
+/** A single query value; null, undefined and "" are dropped when serialised. */
 export type QueryValue = string | number | boolean | null | undefined | string[];
 
 export type FlaskRequestOptions = {

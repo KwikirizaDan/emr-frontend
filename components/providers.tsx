@@ -1,3 +1,7 @@
+/**
+ * Global client providers: shared SWR request defaults plus the toast and
+ * tooltip hosts mounted once at the root of the app.
+ */
 "use client";
 
 import * as React from "react";
@@ -16,6 +20,7 @@ function shouldRetry(error: unknown): boolean {
   return status === 0 || status === undefined;
 }
 
+/** Wraps the app in the shared SWR and UI provider stack. */
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SWRConfig

@@ -33,6 +33,7 @@ export type DiagnosisPayload = {
   certainty: "PROVISIONAL" | "CONFIRMED";
 };
 
+/** Encounter CRUD, close/void and nested diagnosis calls. */
 export const encounterService = {
   list(filters: EncounterFilters = {}): Promise<Paginated<Encounter>> {
     return getList<Encounter>("/encounters", { ...filters });
@@ -84,6 +85,7 @@ export const encounterService = {
     });
   },
 
+  /** Voids a diagnosis entered in error; requires a reason of 5+ characters. */
   removeDiagnosis(diagnosisId: string | number, reason: string): Promise<unknown> {
     return bffRequest(`/diagnoses/${diagnosisId}`, {
       method: "DELETE",

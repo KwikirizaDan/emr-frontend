@@ -1,3 +1,4 @@
+/** Summary metric card for the dashboard. */
 import * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

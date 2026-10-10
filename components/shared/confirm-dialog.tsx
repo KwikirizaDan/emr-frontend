@@ -1,3 +1,4 @@
+/** Confirmation dialog for destructive or irreversible clinical actions. */
 "use client";
 
 import * as React from "react";

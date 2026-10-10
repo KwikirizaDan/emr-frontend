@@ -1,3 +1,7 @@
+/**
+ * Browser-side HTTP client for the same-origin `/api` BFF boundary. See
+ * `BffRequestOptions` for the security rationale.
+ */
 import axios, { type AxiosError } from "axios";
 
 import { ApiError, parseErrorEnvelope } from "@/services/http/api-error";
@@ -34,6 +38,7 @@ function normalizeParams(query?: BffRequestOptions["query"]): Record<string, str
   return params;
 }
 
+/** Performs a request against the BFF and returns the parsed body of type `T`. */
 export async function bffRequest<T = unknown>(
   path: string,
   options: BffRequestOptions = {},

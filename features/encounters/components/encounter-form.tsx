@@ -1,3 +1,4 @@
+// Creates an encounter, optionally prefilled from a patient profile action.
 "use client";
 
 import * as React from "react";
@@ -22,6 +23,7 @@ import { patientService } from "@/services/patients/patient-service";
 import { isApiError } from "@/services/http/api-error";
 import type { Patient } from "@/services/http/api-types";
 
+/** Encounter creation form that resolves the patient from props or the query string. */
 export function EncounterForm({ patientId }: { patientId?: string } = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();

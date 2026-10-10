@@ -1,3 +1,4 @@
+/** Primary application sidebar built from the role-filtered navigation model. */
 "use client";
 
 import Link from "next/link";
@@ -22,6 +23,7 @@ import { NavUser } from "@/components/app-shell/nav-user";
 import type { CurrentUser } from "@/features/auth/hooks/use-current-user";
 import { ROLE_LABELS } from "@/lib/permissions";
 
+/** Renders the collapsible navigation sidebar for the current user. */
 export function AppSidebar({ user }: { user: CurrentUser | null }) {
   const pathname = usePathname();
 
@@ -85,6 +87,7 @@ export function AppSidebar({ user }: { user: CurrentUser | null }) {
   );
 }
 
+/** Resolves a friendly role label, falling back to the raw role or an em dash. */
 export function roleLabel(role: string | null | undefined): string {
   if (!role) return "—";
   return ROLE_LABELS[role as keyof typeof ROLE_LABELS] ?? role;

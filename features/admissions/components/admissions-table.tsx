@@ -1,3 +1,4 @@
+// Admission register: server-backed table with status filtering and pagination.
 "use client";
 
 import * as React from "react";
@@ -16,6 +17,7 @@ import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatDateTime } from "@/lib/date";
 import type { AdmissionDetail } from "@/services/http/api-types";
 
+/** Admission register table with a status filter, pagination and an admit action. */
 export function AdmissionsTable() {
   const { user } = useCurrentUser();
   const [status, setStatus] = React.useState<"" | "ADMITTED" | "DISCHARGED">("");

@@ -1,3 +1,4 @@
+/** Accessible status badges for clinical workflow values. */
 import {
   CircleCheck,
   CircleDashed,
@@ -92,6 +93,7 @@ const STATUS_TONES: Record<string, StatusTone> = {
   INACTIVE: "neutral",
 };
 
+/** Resolves the display tone for a raw workflow status value. */
 export function toneForStatus(status: string | null | undefined): StatusTone {
   if (!status) return "neutral";
   return STATUS_TONES[status] ?? "neutral";

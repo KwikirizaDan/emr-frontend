@@ -1,3 +1,4 @@
+// Admission record: stay details, discharge summary and permission-gated actions.
 "use client";
 
 import * as React from "react";
@@ -19,6 +20,7 @@ import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatDateTime } from "@/lib/date";
 import { humanizeEnum } from "@/lib/formatters";
 
+/** Admission record with stay details and, when permitted, an inline discharge form. */
 export function AdmissionDetail() {
   const params = useParams<{ admissionId: string }>();
   const admissionId = params.admissionId;
@@ -129,6 +131,7 @@ export function AdmissionDetail() {
   );
 }
 
+/** Small label/value pair used throughout the admission details card. */
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-0.5">

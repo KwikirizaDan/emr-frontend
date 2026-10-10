@@ -24,6 +24,7 @@ export type SurgeryPayload = {
   scheduled_end: string;
 };
 
+/** Surgery scheduling and lifecycle transitions. */
 export const surgeryService = {
   list(filters: SurgeryFilters = {}): Promise<Paginated<Surgery>> {
     return getList<Surgery>("/surgeries", { ...filters });

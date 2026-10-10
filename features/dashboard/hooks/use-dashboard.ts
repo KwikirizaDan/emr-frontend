@@ -1,3 +1,4 @@
+/** Dashboard summary data hook built on the same-origin BFF boundary. */
 import useSWR from "swr";
 
 import { bffRequest } from "@/services/http/bff-client";

@@ -1,3 +1,6 @@
+/**
+ * Route: POST /api/auth/login.
+ */
 import type { NextRequest } from "next/server";
 
 import { loginSchema } from "@/features/auth/schemas/login-schema";

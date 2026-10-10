@@ -1,3 +1,4 @@
+/** Paginated, status-filterable list of follow-ups. */
 "use client";
 
 import * as React from "react";
@@ -18,6 +19,7 @@ import type { FollowUp } from "@/services/http/api-types";
 
 const STATUSES = ["SCHEDULED", "COMPLETED", "CANCELLED", "MISSED"] as const;
 
+/** Lists follow-ups with a status filter and permission-gated booking. */
 export function FollowupsTable() {
   const { user } = useCurrentUser();
   const [status, setStatus] = React.useState<"" | (typeof STATUSES)[number]>("");

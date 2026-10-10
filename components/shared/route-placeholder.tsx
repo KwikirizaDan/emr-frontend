@@ -1,3 +1,4 @@
+/** Placeholder page for modules delivered in a later implementation phase. */
 import * as React from "react";
 import { Hammer } from "lucide-react";
 
