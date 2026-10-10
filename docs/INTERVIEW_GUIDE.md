@@ -166,6 +166,9 @@ For every write, after it succeeds, switch to `admin` and show the audit row.
 - **Say:** each row has who, what, old/new values, IP, `request_id`, and time; the
   log is append-only via a database trigger (`UPDATE`/`DELETE` raise).
 
+> Questions the panel tends to fire **while** you click this script are answered in
+> **§17 (Demo Q&A)**.
+
 ---
 
 ## 6. Competency cheat sheet
@@ -399,3 +402,170 @@ Do not overstate ownership; the brief rewards honesty and understanding.
 3. Recite §8 answers out loud, pointing at the files.
 4. Confirm both repos are pushed and the disclosure is filled in.
 5. Have `docs/OFFLINE_TROUBLESHOOTING.md` open in case the local API is down.
+
+---
+
+## 17. Demo Q&A — questions they ask while you click
+
+Short, first-person answers. Where a question invites it, **show don't tell** (the
+suggested move is in *italics*).
+
+### Clinical workflow
+
+**Q: Why does the patient get both an MRN and a national ID?**
+The national ID is real-world identity and may be missing, shared or mistyped; the
+MRN is the hospital's own stable identifier and is always present. We dedupe on
+**either** — same name + DOB + sex, or same national ID — so we catch duplicates
+even when one field is absent.
+
+**Q: What if two patients have no national ID and the same name?**
+We still block it on name + date of birth + sex (`dedupe_key`) and return `409`
+with the existing patient's id, so the registrar opens the existing record instead
+of creating a twin. A deleted patient still counts for dedupe, so an admin restores
+rather than re-registers.
+
+**Q: Why is the encounter locked after it is closed?**
+A closed encounter is the clinical record of that consultation. Locking it
+(`status = CLOSED`) stops silent edits; any correction would be an addendum, which
+is a conscious feature we haven't built (listed as a limitation).
+
+**Q: A nurse created the encounter but can't add the diagnosis — why?**
+Triage and diagnosis are different competencies, so the permission matrix gives
+`encounter:create` to `NURSE` but `diagnosis:*` only to `DOCTOR`/`SURGEON`.
+*Try it: the button is hidden in the UI, and a direct API call returns `403`.*
+
+**Q: Who can close an encounter, and what does "close" require?**
+Only `DOCTOR`/`SURGEON` (`encounter:close`), and it requires at least one
+diagnosis. *Try closing a fresh encounter and show the `422`.*
+
+**Q: How does the bed become free after discharge?**
+Bed occupancy isn't a stored counter — it is **derived** from admissions with
+`status = ADMITTED`. Discharging flips the admission status, so the bed shows free
+automatically and can never drift out of sync. *Show `/wards` before and after.*
+
+**Q: Why can't I discharge a patient who has a scheduled operation?**
+Because that would leave an operation on a discharged patient. The discharge
+service blocks while any surgery is `SCHEDULED` or `IN_PROGRESS`; cancel or complete
+the surgery first.
+
+**Q: What happens to the admission if a surgery is cancelled?**
+The admission stays active — only the surgery moves to `CANCELLED` with a reason.
+Admissions, surgeries, discharges and follow-ups have no delete endpoint at all;
+they change state with a reason so history survives.
+
+**Q: Can you book a follow-up in the past?**
+No. The schema requires a future `scheduled_at`, and status only moves forward from
+`SCHEDULED`. *Show the `422` on a past date.*
+
+**Q: Where does a follow-up show up for the clinician?**
+Two places: the worklist (`/worklists/followups`) and the patient's longitudinal
+record (`/patients/{id}/timeline`), newest first.
+
+### Data & integrity
+
+**Q: How do you stop two admissions for one patient, or two patients in one bed?**
+Two layers: the service checks and returns `409` (`ALREADY_ADMITTED`,
+`BED_OCCUPIED`), and the database enforces it with **partial unique indexes** (one
+`ADMITTED` row per patient and per bed). The bed row is also locked with
+`SELECT ... FOR UPDATE`, so a race can't create the second admission.
+
+**Q: But a plain company would just rely on the service — why both?**
+A service check is a courtesy for a good error message; the database constraint is
+the guarantee. If someone inserts directly via SQL, or two requests race, only the
+constraint holds.
+
+**Q: What does the `version` column do?**
+Optimistic locking. If two staff open the same record and both save, the second
+save is rejected with `409` instead of silently overwriting the first — no lost
+updates on a clinical record.
+
+**Q: How do you validate input — client or server?**
+Both, but the server is authoritative. The Next.js forms use zod for fast feedback;
+every endpoint re-validates with Pydantic schemas that reject unknown fields. The
+client can be bypassed, so it is never trusted.
+
+**Q: Why soft delete everywhere?**
+Clinical and user records must survive for history and audit. `DELETE` sets
+`deleted_at`/`deleted_by_id`/`delete_reason` (reason ≥ 5 chars required), the row
+disappears from lists and returns `404`, and an admin can restore it from the
+recycle bin.
+
+### Security & authorization
+
+**Q: Where is authorization enforced?**
+In `app/permissions.py`, via `@requires_permission` on every route. The UI only
+mirrors the matrix to hide controls; the API is the gate. *Prove it: `curl` an
+admin-only endpoint as `nurse` and show the `403`.*
+
+**Q: The role is in the JWT — why read it from the database instead?**
+So a role change or deactivation takes effect **immediately**. If we trusted the
+token, a demoted or fired user would keep their powers until the token expired.
+The token proves *who*; the database decides *what they may do now*.
+
+**Q: Why can't a doctor read the audit log?**
+Separation of duties. `audit:read` is admin-only so the people being audited don't
+curate their own trail. Doctors can see the clinical record, not the audit trail.
+
+**Q: What stops someone editing or deleting an audit row?**
+Two things: there is no write endpoint for audit logs, and migration `0002` adds a
+PostgreSQL trigger that raises an error on any `UPDATE` or `DELETE`. *Show the
+trigger, then try a raw `UPDATE` in psql and show it fail.*
+
+**Q: Where is the access token kept in the browser?**
+In memory only — never `localStorage`. The refresh token lives in an
+`httpOnly`, `Secure`, `SameSite` cookie set by the Next.js BFF, so page JavaScript
+never sees it. *Open devtools → Application → Cookies and show the refresh cookie
+is not readable from JS.*
+
+**Q: What if the access token expires mid-session?**
+The BFF returns `401 TOKEN_EXPIRED`, the client refreshes once via the cookie,
+stores the new pair and retries the original request. Refresh tokens **rotate** —
+the old one is revoked, and reusing it returns `401 TOKEN_REVOKED`.
+
+**Q: How are passwords stored, and are login errors leaky?**
+Werkzeug scrypt hashes; the same hashing work runs for unknown users and wrong
+passwords, and the error message is identical for both, so you can't enumerate
+usernames. Failed logins are audited.
+
+**Q: Is patient data encrypted?**
+TLS in transit; disks should be encrypted at rest; sensitive columns could get
+field-level encryption. *Be honest:* application-level field encryption is on the
+hardening list, not built.
+
+### Full-stack & architecture
+
+**Q: Why a Next.js BFF instead of calling Flask from the browser?**
+The browser never holds the refresh token or the API base URL, and we get one place
+for cookie handling, refresh-on-401, and server-side rendering. It also keeps CORS
+tight — the browser only talks to Next.js.
+
+**Q: Walk me through one request end to end.**
+Service call → `bffRequest` → Next route handler (`app/api/...`) → Flask
+`/api/v1/...` → route (permission) → schema (validate) → service (rules, audit,
+commit) → model/DB → JSON back up the chain → SWR renders it.
+
+**Q: Why is the frontend's permission map a *mirror* and not the source of truth?**
+It only decides what to *render*. Every check is redone on the server, and a `403`
+must be honoured by showing an access-denied state rather than retrying — that's
+documented at the top of `lib/permissions.ts`.
+
+**Q: What did you build vs. what did AI generate?**
+*Answer from the disclosure in §14 — be specific and honest, and steer to the parts
+you personally changed, ran and debugged.*
+
+### Operations
+
+**Q: The system is slow at 3pm with hundreds of staff — what do you do?**
+Evidence first: `request_id` → logs → `EXPLAIN ANALYZE` the slow query → confirm
+indexes; then scale with more gunicorn workers, PgBouncer pooling, a read replica
+for reports, ward-data caching, and monitoring/alerting.
+
+**Q: The database server dies — how do we recover?**
+Restore the latest `pg_dump` plus WAL replay for point-in-time recovery to a new
+instance, repoint `DATABASE_URL`, verify with the health check and a smoke journey.
+We keep encrypted off-site backups and *drill the restore* — an untested backup
+isn't a backup.
+
+**Q: How do you deploy a change?**
+Backup → deploy code → `flask db upgrade` → restart gunicorn/Next → smoke test the
+six-stage journey → watch logs and metrics.
