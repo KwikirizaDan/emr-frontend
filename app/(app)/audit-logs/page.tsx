@@ -1,15 +1,18 @@
-﻿import { RoutePlaceholder } from "@/components/shared/route-placeholder"
+﻿import { PageHeader } from "@/components/shared/page-header";
+import { AuditTable } from "@/features/audit/components/audit-table";
 
 export const metadata = {
   title: "Audit logs",
-}
+};
 
-export default function Page() {
+export default function AuditLogsPage() {
   return (
-    <RoutePlaceholder
-      title="Audit logs"
-      description="Read-only traceability for administrators."
-      phase="the administration and hardening phase"
-    />
-  )
+    <div className="grid gap-6">
+      <PageHeader
+        title="Audit logs"
+        description="Read-only traceability of every action recorded by the system."
+      />
+      <AuditTable />
+    </div>
+  );
 }
