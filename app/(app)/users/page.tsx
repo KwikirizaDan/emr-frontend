@@ -1,15 +1,18 @@
-﻿import { RoutePlaceholder } from "@/components/shared/route-placeholder"
+﻿import { PageHeader } from "@/components/shared/page-header";
+import { UsersTable } from "@/features/users/components/users-table";
 
 export const metadata = {
   title: "Users",
-}
+};
 
-export default function Page() {
+export default function UsersPage() {
   return (
-    <RoutePlaceholder
-      title="Users"
-      description="Staff account management for administrators."
-      phase="the administration and hardening phase"
-    />
-  )
+    <div className="grid gap-6">
+      <PageHeader
+        title="Users"
+        description="Staff account management for administrators."
+      />
+      <UsersTable />
+    </div>
+  );
 }
