@@ -1,15 +1,18 @@
-﻿import { RoutePlaceholder } from "@/components/shared/route-placeholder"
+﻿import { PageHeader } from "@/components/shared/page-header";
+import { WardManager } from "@/features/wards/components/ward-manager";
 
 export const metadata = {
-  title: "Wards & beds",
-}
+  title: "Wards",
+};
 
-export default function Page() {
+export default function WardsPage() {
   return (
-    <RoutePlaceholder
-      title="Wards & beds"
-      description="Ward and bed occupancy for administration and clinical roles."
-      phase="the inpatient and surgery workflow phase"
-    />
-  )
+    <div className="grid gap-6">
+      <PageHeader
+        title="Wards & beds"
+        description="Configure wards and beds, and see live occupancy."
+      />
+      <WardManager />
+    </div>
+  );
 }

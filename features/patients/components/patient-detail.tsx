@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CalendarPlus, Pencil, Stethoscope } from "lucide-react";
+import { BedDouble, CalendarPlus, Pencil, Stethoscope, UserRound } from "lucide-react";
 import useSWR from "swr";
 
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,6 @@ import { patientService } from "@/services/patients/patient-service";
 import { can, PERMISSIONS } from "@/lib/permissions";
 import { formatMrn, formatPersonDisplayName, formatSex } from "@/lib/formatters";
 import { formatAge, formatDate } from "@/lib/date";
-import { UserRound } from "lucide-react";
 
 export function PatientDetail() {
   const params = useParams<{ patientId: string }>();
@@ -45,6 +44,7 @@ export function PatientDetail() {
   const canUpdate = can({ role: user?.role }, PERMISSIONS.patientUpdate);
   const canCreateEncounter = can({ role: user?.role }, PERMISSIONS.encounterCreate);
   const canCreateFollowUp = can({ role: user?.role }, PERMISSIONS.followupManage);
+  const canAdmit = can({ role: user?.role }, PERMISSIONS.admissionCreate);
 
   return (
     <div className="grid gap-6">
@@ -75,6 +75,15 @@ export function PatientDetail() {
             >
               <CalendarPlus className="size-4" />
               Book follow-up
+            </Button>
+          ) : null}
+          {canAdmit ? (
+            <Button
+              variant="outline"
+              render={<Link href={`/admissions/new?patient_id=${patient.id}`} />}
+            >
+              <BedDouble className="size-4" />
+              Admit
             </Button>
           ) : null}
           {canUpdate ? (

@@ -1,15 +1,18 @@
-﻿import { RoutePlaceholder } from "@/components/shared/route-placeholder"
+﻿import { PageHeader } from "@/components/shared/page-header";
+import { AdmissionsTable } from "@/features/admissions/components/admissions-table";
 
 export const metadata = {
   title: "Admissions",
-}
+};
 
-export default function Page() {
+export default function AdmissionsPage() {
   return (
-    <RoutePlaceholder
-      title="Admissions"
-      description="View admissions, admit eligible patients and discharge them."
-      phase="the inpatient and surgery workflow phase"
-    />
-  )
+    <div className="grid gap-6">
+      <PageHeader
+        title="Admissions"
+        description="Admit patients to a ward bed and record their discharge."
+      />
+      <AdmissionsTable />
+    </div>
+  );
 }
