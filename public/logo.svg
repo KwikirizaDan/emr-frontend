@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Meru EMR">
+  <rect width="32" height="32" rx="6" fill="#EA580C" />
+  <path
+    d="M12.5 7v13.5a3.5 3.5 0 0 0 7 0V13m0-6v6"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path d="M19.5 13h3a3 3 0 0 1 3 3v4.5a3.5 3.5 0 0 1-7 0" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
