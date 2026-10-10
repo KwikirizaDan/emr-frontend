@@ -1,15 +1,18 @@
-﻿import { RoutePlaceholder } from "@/components/shared/route-placeholder"
+﻿import { PageHeader } from "@/components/shared/page-header";
+import { FollowupsWorklist } from "@/features/worklists/components/followups-worklist";
 
 export const metadata = {
   title: "Follow-ups due",
-}
+};
 
-export default function Page() {
+export default function FollowupsWorklistPage() {
   return (
-    <RoutePlaceholder
-      title="Follow-ups due"
-      description="Appointments that are due within a date range."
-      phase="the follow-ups and worklists phase"
-    />
-  )
+    <div className="grid gap-6">
+      <PageHeader
+        title="Follow-ups due"
+        description="Appointments that are due within the selected date range."
+      />
+      <FollowupsWorklist />
+    </div>
+  );
 }

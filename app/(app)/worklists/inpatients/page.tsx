@@ -1,15 +1,18 @@
-﻿import { RoutePlaceholder } from "@/components/shared/route-placeholder"
+﻿import { PageHeader } from "@/components/shared/page-header";
+import { InpatientsWorklist } from "@/features/worklists/components/inpatients-worklist";
 
 export const metadata = {
   title: "Inpatients",
-}
+};
 
-export default function Page() {
+export default function InpatientsWorklistPage() {
   return (
-    <RoutePlaceholder
-      title="Inpatients"
-      description="Patients currently admitted, with ward, bed and admission time."
-      phase="the follow-ups and worklists phase"
-    />
-  )
+    <div className="grid gap-6">
+      <PageHeader
+        title="Inpatients"
+        description="Patients currently admitted, with ward, bed and admission time."
+      />
+      <InpatientsWorklist />
+    </div>
+  );
 }
