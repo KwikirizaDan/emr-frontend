@@ -70,7 +70,6 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.dashboardView,
     PERMISSIONS.patientView,
     PERMISSIONS.patientDelete,
-    PERMISSIONS.timelineView,
     PERMISSIONS.wardView,
     PERMISSIONS.wardManage,
     PERMISSIONS.worklistView,
