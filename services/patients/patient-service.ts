@@ -5,7 +5,7 @@
  * the Flask base URL stay server-side. No business rules live here.
  */
 
-import { getList, getOne } from "@/services/http/list-helpers";
+import { getList, getOne, mutateOne } from "@/services/http/list-helpers";
 import { bffRequest } from "@/services/http/bff-client";
 import type {
   Patient,
@@ -42,11 +42,11 @@ export const patientService = {
   },
 
   create(payload: PatientPayload): Promise<Patient> {
-    return bffRequest<Patient>("/patients", { method: "POST", body: payload });
+    return mutateOne<Patient>("/patients", { method: "POST", body: payload });
   },
 
   update(patientId: string | number, payload: Partial<PatientPayload>): Promise<Patient> {
-    return bffRequest<Patient>(`/patients/${patientId}`, {
+    return mutateOne<Patient>(`/patients/${patientId}`, {
       method: "PATCH",
       body: payload,
     });

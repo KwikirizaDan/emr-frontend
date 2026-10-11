@@ -2,7 +2,7 @@
  * Ward and admissions service.
  */
 
-import { getList, getOne } from "@/services/http/list-helpers";
+import { getList, getOne, mutateOne } from "@/services/http/list-helpers";
 import { bffRequest } from "@/services/http/bff-client";
 import type {
   Admission,
@@ -42,19 +42,18 @@ export type DischargePayload = {
 /** Ward listing and bed management. */
 export const wardService = {
   list(): Promise<WardWithBeds[]> {
-    return bffRequest<WardWithBeds[]>("/wards").then((response) => {
-      // The endpoint has returned both a bare array and a `data` envelope.
-      const data = (response as { data?: WardWithBeds[] }).data;
+    return bffRequest<{ data?: WardWithBeds[] }>("/wards").then((response) => {
+      const data = response?.data;
       return Array.isArray(data) ? data : [];
     });
   },
 
   create(payload: { code: string; name: string }): Promise<WardWithBeds> {
-    return bffRequest<WardWithBeds>("/wards", { method: "POST", body: payload });
+    return mutateOne<WardWithBeds>("/wards", { method: "POST", body: payload });
   },
 
   addBed(wardId: string | number, bed_number: string): Promise<unknown> {
-    return bffRequest(`/wards/${wardId}/beds`, {
+    return bffRequest("/wards/" + String(wardId) + "/beds", {
       method: "POST",
       body: { bed_number },
     });
@@ -68,18 +67,18 @@ export const admissionService = {
   },
 
   getById(admissionId: string | number): Promise<AdmissionDetail | null> {
-    return getOne<AdmissionDetail>(`/admissions/${admissionId}`);
+    return getOne<AdmissionDetail>("/admissions/" + String(admissionId));
   },
 
   create(payload: AdmissionPayload): Promise<Admission> {
-    return bffRequest<Admission>("/admissions", {
+    return mutateOne<Admission>("/admissions", {
       method: "POST",
       body: payload,
     });
   },
 
   discharge(admissionId: string | number, payload: DischargePayload): Promise<Admission> {
-    return bffRequest<Admission>(`/admissions/${admissionId}/discharge`, {
+    return mutateOne<Admission>("/admissions/" + String(admissionId) + "/discharge", {
       method: "POST",
       body: payload,
     });

@@ -2,7 +2,7 @@
  * Users service (admin).
  */
 
-import { getList, getOne } from "@/services/http/list-helpers";
+import { getList, getOne, mutateOne } from "@/services/http/list-helpers";
 import { bffRequest } from "@/services/http/bff-client";
 import type { Paginated, User } from "@/services/http/api-types";
 
@@ -31,11 +31,11 @@ export const userService = {
   },
 
   create(payload: UserPayload): Promise<User> {
-    return bffRequest<User>("/users", { method: "POST", body: payload });
+    return mutateOne<User>("/users", { method: "POST", body: payload });
   },
 
   update(userId: string | number, payload: Partial<UserPayload>): Promise<User> {
-    return bffRequest<User>(`/users/${userId}`, {
+    return mutateOne<User>(`/users/${userId}`, {
       method: "PATCH",
       body: payload,
     });

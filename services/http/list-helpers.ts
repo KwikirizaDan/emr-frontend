@@ -4,7 +4,7 @@
  * `/api/...` and the route handlers attach the session.
  */
 
-import { bffRequest } from "@/services/http/bff-client";
+import { bffRequest, type BffRequestOptions } from "@/services/http/bff-client";
 import type { Paginated, PaginationMeta } from "@/services/http/api-types";
 
 export type ListQuery = {
@@ -43,4 +43,13 @@ export async function getList<T>(
 export async function getOne<T>(path: string): Promise<T | null> {
   const response = await bffRequest<{ data?: T | null }>(path);
   return response?.data ?? null;
+}
+
+/** Sends a mutating request and returns the `data` payload of the response. */
+export async function mutateOne<T>(
+  path: string,
+  options?: BffRequestOptions,
+): Promise<T> {
+  const response = await bffRequest<{ data?: T }>(path, options as any);
+  return (response?.data ?? null) as T;
 }

@@ -2,7 +2,7 @@
  * Follow-up service.
  */
 
-import { getList, getOne } from "@/services/http/list-helpers";
+import { getList, getOne, mutateOne } from "@/services/http/list-helpers";
 import { bffRequest } from "@/services/http/bff-client";
 import type { FollowUp, Paginated } from "@/services/http/api-types";
 
@@ -39,21 +39,21 @@ export const followUpService = {
   },
 
   create(payload: FollowUpPayload): Promise<FollowUp> {
-    return bffRequest<FollowUp>("/followups", {
+    return mutateOne<FollowUp>("/followups", {
       method: "POST",
       body: payload,
     });
   },
 
   update(followUpId: string | number, payload: Partial<FollowUpPayload>): Promise<FollowUp> {
-    return bffRequest<FollowUp>(`/followups/${followUpId}`, {
+    return mutateOne<FollowUp>(`/followups/${followUpId}`, {
       method: "PATCH",
       body: payload,
     });
   },
 
   changeStatus(followUpId: string | number, payload: FollowUpStatusPayload): Promise<FollowUp> {
-    return bffRequest<FollowUp>(`/followups/${followUpId}/status`, {
+    return mutateOne<FollowUp>(`/followups/${followUpId}/status`, {
       method: "POST",
       body: payload,
     });

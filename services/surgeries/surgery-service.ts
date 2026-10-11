@@ -2,7 +2,7 @@
  * Surgery service.
  */
 
-import { getList, getOne } from "@/services/http/list-helpers";
+import { getList, getOne, mutateOne } from "@/services/http/list-helpers";
 import { bffRequest } from "@/services/http/bff-client";
 import type { Paginated, Surgery } from "@/services/http/api-types";
 
@@ -35,32 +35,32 @@ export const surgeryService = {
   },
 
   create(payload: SurgeryPayload): Promise<Surgery> {
-    return bffRequest<Surgery>("/surgeries", {
+    return mutateOne<Surgery>("/surgeries", {
       method: "POST",
       body: payload,
     });
   },
 
   update(surgeryId: string | number, payload: Partial<SurgeryPayload>): Promise<Surgery> {
-    return bffRequest<Surgery>(`/surgeries/${surgeryId}`, {
+    return mutateOne<Surgery>(`/surgeries/${surgeryId}`, {
       method: "PATCH",
       body: payload,
     });
   },
 
   start(surgeryId: string | number): Promise<Surgery> {
-    return bffRequest<Surgery>(`/surgeries/${surgeryId}/start`, { method: "POST" });
+    return mutateOne<Surgery>(`/surgeries/${surgeryId}/start`, { method: "POST" });
   },
 
   complete(surgeryId: string | number, payload: { outcome_notes: string }): Promise<Surgery> {
-    return bffRequest<Surgery>(`/surgeries/${surgeryId}/complete`, {
+    return mutateOne<Surgery>(`/surgeries/${surgeryId}/complete`, {
       method: "POST",
       body: payload,
     });
   },
 
   cancel(surgeryId: string | number, payload: { reason: string }): Promise<Surgery> {
-    return bffRequest<Surgery>(`/surgeries/${surgeryId}/cancel`, {
+    return mutateOne<Surgery>(`/surgeries/${surgeryId}/cancel`, {
       method: "POST",
       body: payload,
     });

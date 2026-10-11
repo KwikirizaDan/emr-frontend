@@ -2,7 +2,7 @@
  * Encounter and diagnosis service.
  */
 
-import { getList, getOne } from "@/services/http/list-helpers";
+import { getList, getOne, mutateOne } from "@/services/http/list-helpers";
 import { bffRequest } from "@/services/http/bff-client";
 import type {
   Diagnosis,
@@ -44,21 +44,21 @@ export const encounterService = {
   },
 
   create(payload: EncounterPayload): Promise<EncounterDetail> {
-    return bffRequest<EncounterDetail>("/encounters", {
+    return mutateOne<EncounterDetail>("/encounters", {
       method: "POST",
       body: payload,
     });
   },
 
   update(encounterId: string | number, payload: Partial<EncounterPayload>): Promise<EncounterDetail> {
-    return bffRequest<EncounterDetail>(`/encounters/${encounterId}`, {
+    return mutateOne<EncounterDetail>(`/encounters/${encounterId}`, {
       method: "PATCH",
       body: payload,
     });
   },
 
   close(encounterId: string | number): Promise<EncounterDetail> {
-    return bffRequest<EncounterDetail>(`/encounters/${encounterId}/close`, {
+    return mutateOne<EncounterDetail>(`/encounters/${encounterId}/close`, {
       method: "POST",
     });
   },
@@ -72,14 +72,14 @@ export const encounterService = {
   },
 
   addDiagnosis(encounterId: string | number, payload: DiagnosisPayload): Promise<Diagnosis> {
-    return bffRequest<Diagnosis>(`/encounters/${encounterId}/diagnoses`, {
+    return mutateOne<Diagnosis>(`/encounters/${encounterId}/diagnoses`, {
       method: "POST",
       body: payload,
     });
   },
 
   updateDiagnosis(diagnosisId: string | number, payload: Partial<DiagnosisPayload>): Promise<Diagnosis> {
-    return bffRequest<Diagnosis>(`/diagnoses/${diagnosisId}`, {
+    return mutateOne<Diagnosis>(`/diagnoses/${diagnosisId}`, {
       method: "PATCH",
       body: payload,
     });
