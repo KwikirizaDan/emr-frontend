@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import useSWR from "swr";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
@@ -60,7 +60,7 @@ export function DashboardSummary() {
 
   return (
     <PermissionGate
-      subject={{ role: user.role }}
+      subject={user}
       permission={PERMISSIONS.dashboardView}
       fallback={<AccessDenied />}
     >
@@ -121,9 +121,9 @@ export function DashboardWorkPanels() {
   const { user } = useCurrentUser();
   const today = todayKey();
 
-  const canSeeSurgeries = can({ role: user?.role }, PERMISSIONS.surgeryView);
-  const canSeeInpatients = can({ role: user?.role }, PERMISSIONS.admissionView);
-  const canSeeFollowups = can({ role: user?.role }, PERMISSIONS.followupView);
+  const canSeeSurgeries = can(user, PERMISSIONS.worklistView);
+  const canSeeInpatients = can(user, PERMISSIONS.worklistView);
+  const canSeeFollowups = can(user, PERMISSIONS.worklistView);
 
   const surgeries = useSWR(
     canSeeSurgeries ? `/worklists/surgeries?day=${today}&per_page=5` : null,
@@ -264,9 +264,12 @@ function WorkPanel({
           </span>
           <CardTitle className="text-sm font-medium">{title}</CardTitle>
         </div>
-        <Button variant="ghost" size="xs" render={<Link href={href} />}>
+        <Link
+          href={href}
+          className={buttonVariants({ variant: "ghost", size: "xs" })}
+        >
           View all
-        </Button>
+        </Link>
       </CardHeader>
       <CardContent className="grid gap-1">
         {isLoading ? (

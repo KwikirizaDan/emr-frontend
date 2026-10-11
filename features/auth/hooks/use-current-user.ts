@@ -9,9 +9,11 @@ export type CurrentUser = {
   fullName: string;
   email: string | null;
   role: string;
+  /** Effective permission set decided by the API. */
+  permissions: string[];
 };
 
-type CurrentUserResponse = { data: CurrentUser };
+type MeResponse = { data: { user: CurrentUser } };
 
 const CURRENT_USER_KEY = "/auth/me";
 
@@ -19,14 +21,15 @@ const CURRENT_USER_KEY = "/auth/me";
  * Loads the signed-in user from the same-origin auth boundary.
  *
  * Navigation gating uses this only to hide controls the current role cannot
- * use. A 403 from Flask is still the final answer.
+ * use; the permission list comes straight from Flask, and a 403 from the
+ * backend remains the final answer.
  */
 export function useCurrentUser() {
-  const { data, error, isLoading, mutate } = useSWR<CurrentUser>(
+  const { data, error, isLoading, mutate } = useSWR<CurrentUser | null>(
     CURRENT_USER_KEY,
-    async (path: string) => {
-      const response = await bffRequest<CurrentUserResponse>(path);
-      return response.data;
+    async () => {
+      const body = await bffRequest<MeResponse>(CURRENT_USER_KEY);
+      return body.data.user;
     },
   );
 

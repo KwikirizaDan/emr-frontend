@@ -1,11 +1,13 @@
 /**
  * Client-side permission helpers.
  *
- * IMPORTANT: this is a UI-convenience mirror only. It exists so navigation and
- * controls can be hidden before a pointless request is made. Flask is the sole
- * authority for authorisation — every one of these checks must still be
- * reconsidered by the backend, and a `403` must always be honoured by showing an
- * access-denied state rather than retrying.
+ * IMPORTANT: Flask is the sole authority for authorisation. The API advertises
+ * each role's effective permission set on `/auth/login` and `/auth/me`, and
+ * `can()` uses that list verbatim. The matrix below is only a conservative
+ * offline fallback so the UI can render while the request is in flight and
+ * keep working for an unknown/legacy user. Every check must still be
+ * reconsidered by the backend, and a `403` must always be honoured by showing
+ * an access-denied state rather than retrying.
  */
 
 export const ROLES = ["ADMIN", "REGISTRAR", "NURSE", "DOCTOR", "SURGEON"] as const;
@@ -19,33 +21,40 @@ export const ROLE_LABELS: Record<Role, string> = {
   SURGEON: "Surgeon",
 };
 
+/**
+ * Permission strings decided by the API (`app/permissions.py`). The client
+ * mirrors them by name so `can()` can compare the API-provided list directly.
+ */
 export const PERMISSIONS = {
   dashboardView: "dashboard:view",
-  patientView: "patient:view",
+  patientView: "patient:read",
   patientCreate: "patient:create",
   patientUpdate: "patient:update",
   patientDelete: "patient:delete",
-  encounterView: "encounter:view",
+  timelineView: "timeline:read",
+  encounterView: "encounter:read",
   encounterCreate: "encounter:create",
   encounterUpdate: "encounter:update",
   encounterClose: "encounter:close",
   diagnosisCreate: "diagnosis:create",
   diagnosisUpdate: "diagnosis:update",
   diagnosisDelete: "diagnosis:delete",
-  admissionView: "admission:view",
+  admissionView: "admission:read",
   admissionCreate: "admission:create",
   admissionDischarge: "admission:discharge",
-  wardView: "ward:view",
+  wardView: "ward:read",
   wardManage: "ward:manage",
-  surgeryView: "surgery:view",
-  surgeryManage: "surgery:manage",
-  followupView: "followup:view",
-  followupManage: "followup:manage",
-  userView: "user:view",
+  surgeryView: "surgery:read",
+  surgeryManage: "surgery:update",
+  followupView: "followup:read",
+  followupCreate: "followup:create",
+  followupManage: "followup:update",
+  userView: "user:manage",
   userManage: "user:manage",
-  auditView: "audit:view",
+  auditView: "audit:read",
   recycleBinView: "recyclebin:read",
   recycleBinRestore: "recyclebin:restore",
+  worklistView: "worklist:read",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -53,18 +62,18 @@ export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 const ALL: Permission[] = Object.values(PERMISSIONS);
 
 /**
- * Conservative mapping derived from the role matrix in the blueprint.
- * Where the backend is known to be stricter, the narrower set wins.
+ * Offline mirror of `ROLE_PERMISSIONS` in `app/permissions.py`. The API's own
+ * list always wins in `can()`; this only fills in while it is unavailable.
  */
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-  // An administrator manages accounts, wards and the audit trail but is
-  // deliberately not given clinical record access by the backend.
   ADMIN: [
     PERMISSIONS.dashboardView,
     PERMISSIONS.patientView,
+    PERMISSIONS.patientDelete,
+    PERMISSIONS.timelineView,
     PERMISSIONS.wardView,
     PERMISSIONS.wardManage,
-    PERMISSIONS.followupView,
+    PERMISSIONS.worklistView,
     PERMISSIONS.userView,
     PERMISSIONS.userManage,
     PERMISSIONS.auditView,
@@ -77,26 +86,30 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.patientCreate,
     PERMISSIONS.patientUpdate,
     PERMISSIONS.followupView,
+    PERMISSIONS.followupCreate,
     PERMISSIONS.followupManage,
+    PERMISSIONS.worklistView,
   ],
   NURSE: [
     PERMISSIONS.dashboardView,
     PERMISSIONS.patientView,
-    PERMISSIONS.patientCreate,
-    PERMISSIONS.patientUpdate,
+    PERMISSIONS.timelineView,
     PERMISSIONS.encounterView,
     PERMISSIONS.encounterCreate,
     PERMISSIONS.encounterUpdate,
     PERMISSIONS.admissionView,
     PERMISSIONS.admissionCreate,
     PERMISSIONS.wardView,
+    PERMISSIONS.surgeryView,
     PERMISSIONS.followupView,
+    PERMISSIONS.worklistView,
   ],
   DOCTOR: [
     PERMISSIONS.dashboardView,
     PERMISSIONS.patientView,
     PERMISSIONS.patientCreate,
     PERMISSIONS.patientUpdate,
+    PERMISSIONS.timelineView,
     PERMISSIONS.encounterView,
     PERMISSIONS.encounterCreate,
     PERMISSIONS.encounterUpdate,
@@ -108,8 +121,11 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.admissionCreate,
     PERMISSIONS.admissionDischarge,
     PERMISSIONS.wardView,
+    PERMISSIONS.surgeryView,
     PERMISSIONS.followupView,
+    PERMISSIONS.followupCreate,
     PERMISSIONS.followupManage,
+    PERMISSIONS.worklistView,
   ],
   // Surgeon: doctor capabilities plus surgery scheduling and transitions.
   SURGEON: [
@@ -117,6 +133,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.patientView,
     PERMISSIONS.patientCreate,
     PERMISSIONS.patientUpdate,
+    PERMISSIONS.timelineView,
     PERMISSIONS.encounterView,
     PERMISSIONS.encounterCreate,
     PERMISSIONS.encounterUpdate,
@@ -131,7 +148,9 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.surgeryView,
     PERMISSIONS.surgeryManage,
     PERMISSIONS.followupView,
+    PERMISSIONS.followupCreate,
     PERMISSIONS.followupManage,
+    PERMISSIONS.worklistView,
   ],
 };
 
@@ -153,7 +172,8 @@ export const ALL_PERMISSIONS: readonly Permission[] = ALL;
 
 export function can(subject: PermissionSubject, permission: Permission): boolean {
   if (!subject) return false;
-  // An explicit permission list from the API wins over the mirrored role map.
+  // The permission list supplied by the API is authoritative and wins over the
+  // mirrored role map whenever it is present.
   if (subject.permissions?.length) {
     return subject.permissions.includes(permission);
   }

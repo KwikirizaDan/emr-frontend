@@ -31,7 +31,7 @@ export function SurgeriesTable() {
     () => surgeryService.list({ status: status || undefined, page, per_page: perPage }),
   );
 
-  const canManage = can({ role: user?.role }, PERMISSIONS.surgeryManage);
+  const canManage = can(user, PERMISSIONS.surgeryManage);
 
   const columns: DataTableColumn<Surgery>[] = [
     { id: "id", header: "Surgery", cell: (surgery) => <span className="font-mono text-xs">#{surgery.id}</span> },

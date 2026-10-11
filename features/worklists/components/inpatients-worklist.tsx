@@ -22,7 +22,7 @@ export function InpatientsWorklist() {
   const [page, setPage] = React.useState(1);
   const [perPage, setPerPage] = React.useState(20);
 
-  const canView = can({ role: user?.role }, PERMISSIONS.admissionView);
+  const canView = can(user, PERMISSIONS.worklistView);
 
   const { data, error, isLoading, mutate } = useSWR(
     canView ? `/worklists/inpatients?page=${page}&per_page=${perPage}` : null,

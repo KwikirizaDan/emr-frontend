@@ -27,9 +27,9 @@ import { ROLE_LABELS } from "@/lib/permissions";
 export function AppSidebar({ user }: { user: CurrentUser | null }) {
   const pathname = usePathname();
 
-  const sections: NavSection[] = filterNavSections({
-    role: user?.role ?? null,
-  });
+  // The user object carries `role` (and the API-decided `permissions`), so the
+  // navigation is filtered by what Flask advertises rather than a client guess.
+  const sections: NavSection[] = filterNavSections(user);
 
   return (
     <Sidebar collapsible="icon">

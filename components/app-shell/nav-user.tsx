@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -72,14 +73,16 @@ export function NavUser({ user }: { user: CurrentUser | null }) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" side="top" className="w-56">
-        <DropdownMenuLabel className="grid gap-0.5">
-          <span className="text-xs font-medium text-foreground">
-            {user.fullName || user.username}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {user.email || user.username} · {roleLabel(user.role)}
-          </span>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="grid gap-0.5">
+            <span className="text-xs font-medium text-foreground">
+              {user.fullName || user.username}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {user.email || user.username} · {roleLabel(user.role)}
+            </span>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled>
           <UserRound />

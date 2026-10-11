@@ -32,8 +32,8 @@ export function UsersTable() {
   const [reasonError, setReasonError] = React.useState<string | null>(null);
   const [deleting, setDeleting] = React.useState(false);
 
-  const canView = can({ role: currentUser?.role }, PERMISSIONS.userView);
-  const canManage = can({ role: currentUser?.role }, PERMISSIONS.userManage);
+  const canView = can(currentUser, PERMISSIONS.userView);
+  const canManage = can(currentUser, PERMISSIONS.userManage);
 
   const { data, error, isLoading, mutate } = useSWR(
     canView ? `/users?page=${page}&per_page=${perPage}` : null,

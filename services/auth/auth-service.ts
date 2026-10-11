@@ -8,7 +8,7 @@
 import "server-only";
 
 import { ENDPOINTS } from "@/services/http/endpoints";
-import { flaskRequest } from "@/services/http/api-client";
+import { flaskRequest, type FlaskResponse } from "@/services/http/api-client";
 import {
   ApiError,
   messageForStatus,
@@ -41,6 +41,7 @@ type RawUser = {
   fullName?: string;
   email?: string;
   role?: string;
+  permissions?: string[];
 };
 
 type LoginResponse = AuthTokens & {
@@ -54,6 +55,7 @@ function toSessionUser(raw: RawUser): SessionUser {
     fullName: raw.full_name ?? raw.fullName ?? raw.username ?? "",
     email: raw.email ?? null,
     role: raw.role ?? "",
+    permissions: Array.isArray(raw.permissions) ? raw.permissions : [],
   };
 }
 
@@ -77,10 +79,9 @@ function coerceExpiry(value: number | string | undefined): number | null {
 
 /**
  * Never reveal whether a username exists: every failed sign-in returns the same
- * generic message regardless of the underlying reason.
+ * message from the API regardless of the underlying reason, so the token
+ * boundary simply forwards whatever Flask decided.
  */
-const GENERIC_LOGIN_FAILURE = "Incorrect username or password.";
-
 function buildSession(login: LoginResponse): SessionPayload | null {
   if (!login.access_token || !login.refresh_token) return null;
 
@@ -117,27 +118,25 @@ function refreshSession(refresh: RefreshResponse, previous: SessionPayload): Ses
 export const authService = {
   /** Calls `POST /auth/login` and normalises the response into a session. */
   async login(input: LoginInput): Promise<AuthResult> {
-    const response = await flaskRequest<LoginResponse>(ENDPOINTS.auth.login, {
-      method: "POST",
-      body: input,
-    });
+    let response: FlaskResponse<LoginResponse>;
+    try {
+      response = await flaskRequest<LoginResponse>(ENDPOINTS.auth.login, {
+        method: "POST",
+        body: input,
+      });
+    } catch (error) {
+      // `flaskRequest` throws only when the backend is unreachable; keep that
+      // as the auth failure rather than letting it crash the route handler.
+      if (error instanceof ApiError) return { ok: false, error };
+      throw error;
+    }
 
     if (!response.ok) {
-      // 401 means bad credentials; anything else keeps Flask's own message so
-      // support can diagnose it, but the username is never confirmed to the user.
-      const message =
-        response.status === 401
-          ? GENERIC_LOGIN_FAILURE
-          : (response.data as { error?: { message?: string } })?.error?.message ??
-            messageForStatus(response.status);
+      // Flask owns the wording (e.g. "Invalid username or password") and never
+      // confirms whether a username exists, so its message is always the same.
       return {
         ok: false,
-        error: new ApiError({
-          status: response.status,
-          code: (response.data as { error?: { code?: string } })?.error?.code ?? null,
-          message,
-          requestId: response.requestId,
-        }),
+        error: parseErrorEnvelope(response.status, response.data, response.requestId),
       };
     }
 
@@ -150,12 +149,18 @@ export const authService = {
 
   /** Rotates the access token using the refresh token stored in the session. */
   async refresh(session: SessionPayload): Promise<AuthResult> {
-    const response = await flaskRequest<RefreshResponse>(ENDPOINTS.auth.refresh, {
-      method: "POST",
-      // Accept either documented shape: bearer refresh token or JSON body.
-      accessToken: session.refreshToken,
-      body: { refresh_token: session.refreshToken },
-    });
+    let response: FlaskResponse<RefreshResponse>;
+    try {
+      response = await flaskRequest<RefreshResponse>(ENDPOINTS.auth.refresh, {
+        method: "POST",
+        // Accept either documented shape: bearer refresh token or JSON body.
+        accessToken: session.refreshToken,
+        body: { refresh_token: session.refreshToken },
+      });
+    } catch (error) {
+      if (error instanceof ApiError) return { ok: false, error };
+      throw error;
+    }
 
     if (!response.ok) {
       return { ok: false, error: parseErrorEnvelope(response.status, response.data, response.requestId) };

@@ -57,13 +57,13 @@ export class ApiError extends Error {
     return result;
   }
 
-  /** User-facing message that is always safe to render. */
+  /**
+   * User-facing message, exactly as Flask decided it. The API's error handler
+   * only ever emits safe wording (e.g. "Invalid username or password.",
+   * "Something went wrong. Quote the request id to support."), so nothing is
+   * rewritten on this side.
+   */
   get displayMessage(): string {
-    if (this.status === 0 || (this.status >= 500 && this.status <= 599)) {
-      return this.message.includes("request")
-        ? "The service is temporarily unavailable. Please try again."
-        : "The service is temporarily unavailable. Please try again.";
-    }
     return this.message;
   }
 }

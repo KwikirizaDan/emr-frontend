@@ -47,9 +47,9 @@ export function PatientsTable() {
     per_page: perPage,
   });
 
-  const canCreate = can({ role: user?.role }, PERMISSIONS.patientCreate);
-  const canUpdate = can({ role: user?.role }, PERMISSIONS.patientUpdate);
-  const canDelete = can({ role: user?.role }, PERMISSIONS.patientDelete);
+  const canCreate = can(user, PERMISSIONS.patientCreate);
+  const canUpdate = can(user, PERMISSIONS.patientUpdate);
+  const canDelete = can(user, PERMISSIONS.patientDelete);
 
   async function confirmDelete() {
     if (!pendingDelete) return;

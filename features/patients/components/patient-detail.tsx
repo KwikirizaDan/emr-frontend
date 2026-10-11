@@ -43,10 +43,11 @@ export function PatientDetail() {
     );
   }
 
-  const canUpdate = can({ role: user?.role }, PERMISSIONS.patientUpdate);
-  const canCreateEncounter = can({ role: user?.role }, PERMISSIONS.encounterCreate);
-  const canCreateFollowUp = can({ role: user?.role }, PERMISSIONS.followupManage);
-  const canAdmit = can({ role: user?.role }, PERMISSIONS.admissionCreate);
+  const canUpdate = can(user, PERMISSIONS.patientUpdate);
+  const canCreateEncounter = can(user, PERMISSIONS.encounterCreate);
+  const canCreateFollowUp = can(user, PERMISSIONS.followupCreate);
+  const canAdmit = can(user, PERMISSIONS.admissionCreate);
+  const canViewTimeline = can(user, PERMISSIONS.timelineView);
 
   return (
     <div className="grid gap-6">
@@ -100,14 +101,16 @@ export function PatientDetail() {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          {canViewTimeline ? <TabsTrigger value="timeline">Timeline</TabsTrigger> : null}
         </TabsList>
         <TabsContent value="overview" className="pt-4">
           <PatientSummary patient={patient} />
         </TabsContent>
-        <TabsContent value="timeline" className="pt-4">
-          <PatientTimeline patientId={patient.id} />
-        </TabsContent>
+        {canViewTimeline ? (
+          <TabsContent value="timeline" className="pt-4">
+            <PatientTimeline patientId={patient.id} />
+          </TabsContent>
+        ) : null}
       </Tabs>
     </div>
   );

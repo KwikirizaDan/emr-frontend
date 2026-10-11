@@ -53,7 +53,7 @@ export function AuditTable() {
   const [perPage, setPerPage] = React.useState(20);
   const [selected, setSelected] = React.useState<AuditLog | null>(null);
 
-  const canView = can({ role: user?.role }, PERMISSIONS.auditView);
+  const canView = can(user, PERMISSIONS.auditView);
 
   const { data, error, isLoading, mutate } = useSWR(
     canView ? ["/audit-logs", applied, page, perPage] : null,

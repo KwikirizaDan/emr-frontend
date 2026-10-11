@@ -43,8 +43,8 @@ export function AdmissionDetail() {
     );
   }
 
-  const canDischarge = can({ role: user?.role }, PERMISSIONS.admissionDischarge);
-  const canScheduleSurgery = can({ role: user?.role }, PERMISSIONS.surgeryManage);
+  const canDischarge = can(user, PERMISSIONS.admissionDischarge);
+  const canScheduleSurgery = can(user, PERMISSIONS.surgeryManage);
   const isAdmitted = admission.status === "ADMITTED";
 
   return (

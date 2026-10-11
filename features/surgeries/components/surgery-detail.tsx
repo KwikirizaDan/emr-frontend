@@ -57,7 +57,7 @@ export function SurgeryDetail() {
     );
   }
 
-  const canManage = can({ role: user?.role }, PERMISSIONS.surgeryManage);
+  const canManage = can(user, PERMISSIONS.surgeryManage);
 
   async function start() {
     setStarting(true);

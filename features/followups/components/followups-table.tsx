@@ -31,7 +31,7 @@ export function FollowupsTable() {
     () => followUpService.list({ status: status || undefined, page, per_page: perPage }),
   );
 
-  const canManage = can({ role: user?.role }, PERMISSIONS.followupManage);
+  const canManage = can(user, PERMISSIONS.followupManage);
 
   const columns: DataTableColumn<FollowUp>[] = [
     {

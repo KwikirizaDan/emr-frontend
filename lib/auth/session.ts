@@ -42,6 +42,8 @@ export type SessionUser = {
   fullName: string;
   email: string | null;
   role: string;
+  /** Effective permission set decided by the API (`/auth/login`, `/auth/me`). */
+  permissions: string[];
 };
 
 export type SessionPayload = {

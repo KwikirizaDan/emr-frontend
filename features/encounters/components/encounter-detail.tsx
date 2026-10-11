@@ -54,10 +54,10 @@ export function EncounterDetail() {
   }
 
   const isOpen = encounter.status === "OPEN";
-  const canClose = can({ role: user?.role }, PERMISSIONS.encounterClose);
-  const canDiagnose = can({ role: user?.role }, PERMISSIONS.diagnosisCreate);
-  const canDeleteDiagnosis = can({ role: user?.role }, PERMISSIONS.diagnosisDelete);
-  const canVoid = can({ role: user?.role }, PERMISSIONS.encounterUpdate);
+  const canClose = can(user, PERMISSIONS.encounterClose);
+  const canDiagnose = can(user, PERMISSIONS.diagnosisCreate);
+  const canDeleteDiagnosis = can(user, PERMISSIONS.diagnosisDelete);
+  const canVoid = can(user, PERMISSIONS.encounterUpdate);
 
   async function closeEncounter() {
     setClosing(true);

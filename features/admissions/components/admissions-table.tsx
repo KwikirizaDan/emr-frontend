@@ -29,7 +29,7 @@ export function AdmissionsTable() {
     () => admissionService.list({ status: status || undefined, page, per_page: perPage }),
   );
 
-  const canCreate = can({ role: user?.role }, PERMISSIONS.admissionCreate);
+  const canCreate = can(user, PERMISSIONS.admissionCreate);
 
   const columns: DataTableColumn<AdmissionDetail>[] = [
     {

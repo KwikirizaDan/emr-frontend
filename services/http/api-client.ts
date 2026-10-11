@@ -101,7 +101,12 @@ function requestIdFrom(headers: unknown): string | null {
 }
 
 /**
- * Performs a request against Flask and returns the parsed body plus status.
+ * Performs a request against Flask and returns the unwrapped payload plus status.
+ *
+ * Successful Flask responses use the documented `{ data, meta }` envelope, so
+ * the `data` field is unwrapped here and callers receive the payload itself
+ * (e.g. the token pair for `/auth/login`). Error bodies keep their `{ error }`
+ * shape so `parseErrorEnvelope` can read them.
  *
  * HTTP error statuses are *not* thrown here so callers such as the auth
  * boundary can inspect a `401` and decide whether to refresh first. Use
@@ -126,10 +131,18 @@ export async function flaskRequest<T = unknown>(
       signal,
     });
 
+    const ok = response.status >= 200 && response.status < 300;
+    const raw = response.data as unknown;
+    // Unwrap `{ data }` only on success; error envelopes have no `data` key.
+    const payload =
+      ok && raw && typeof raw === "object" && "data" in (raw as Record<string, unknown>)
+        ? (raw as { data?: unknown }).data
+        : raw;
+
     return {
       status: response.status,
-      ok: response.status >= 200 && response.status < 300,
-      data: (response.data ?? null) as T | null,
+      ok,
+      data: (payload ?? null) as T | null,
       requestId: requestIdFrom(response.headers),
     };
   } catch (error) {

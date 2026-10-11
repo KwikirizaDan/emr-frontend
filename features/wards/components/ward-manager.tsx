@@ -26,7 +26,7 @@ import type { WardWithBeds } from "@/services/http/api-types";
 /** Ward and bed administration. Visible to administrators only. */
 export function WardManager() {
   const { user } = useCurrentUser();
-  const canManage = can({ role: user?.role }, PERMISSIONS.wardManage);
+  const canManage = can(user, PERMISSIONS.wardManage);
 
   const { data: wards, error, isLoading, mutate } = useSWR("/wards", () => wardService.list());
 

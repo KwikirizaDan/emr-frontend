@@ -51,7 +51,7 @@ export function FollowupDetail() {
     );
   }
 
-  const canManage = can({ role: user?.role }, PERMISSIONS.followupManage);
+  const canManage = can(user, PERMISSIONS.followupManage);
   const isOpen = followUp.status === "SCHEDULED";
 
   async function complete() {

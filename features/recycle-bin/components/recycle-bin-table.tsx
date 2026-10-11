@@ -58,8 +58,8 @@ export function RecycleBinTable() {
   const [restoring, setRestoring] = React.useState(false);
   const [selected, setSelected] = React.useState<RecycleBinItem | null>(null);
 
-  const canView = can({ role: user?.role }, PERMISSIONS.recycleBinView);
-  const canRestore = can({ role: user?.role }, PERMISSIONS.recycleBinRestore);
+  const canView = can(user, PERMISSIONS.recycleBinView);
+  const canRestore = can(user, PERMISSIONS.recycleBinRestore);
 
   // The SWR key doubles as the cache identity: a filter or page change is a new
   // key. Passing null when unpermitted skips the request entirely.

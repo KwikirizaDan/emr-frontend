@@ -32,7 +32,7 @@ export function FollowupsWorklist() {
   const [page, setPage] = React.useState(1);
   const [perPage, setPerPage] = React.useState(20);
 
-  const canView = can({ role: user?.role }, PERMISSIONS.followupView);
+  const canView = can(user, PERMISSIONS.worklistView);
 
   const { data, error, isLoading, mutate } = useSWR(
     canView ? `/worklists/followups?from=${dateFrom}&to=${dateTo}&page=${page}&per_page=${perPage}` : null,

@@ -30,7 +30,7 @@ export function EncountersTable() {
     encounterService.list({ status: status || undefined, page, per_page: perPage }),
   );
 
-  const canCreate = can({ role: user?.role }, PERMISSIONS.encounterCreate);
+  const canCreate = can(user, PERMISSIONS.encounterCreate);
 
   const columns: DataTableColumn<Encounter>[] = [
     {

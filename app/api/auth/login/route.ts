@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
         fullName: result.session.user.fullName,
         email: result.session.user.email,
         role: result.session.user.role,
+        permissions: result.session.user.permissions,
       },
     },
   });

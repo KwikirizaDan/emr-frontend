@@ -18,34 +18,18 @@ export type ErrorStateProps = {
 /** Turns an unknown error into a safe user-facing message and support reference. */
 function describe(error: unknown): { message: string; requestId: string | null } {
   const apiError = error as Partial<ApiError> | undefined;
-  const status = apiError?.status;
-  const requestId = apiError?.requestId ?? null;
-
-  if (status === 403) {
-    return {
-      message: "You do not have permission to view this information.",
-      requestId,
-    };
-  }
-  if (status === 404) {
-    return { message: "The record could not be found or is no longer available.", requestId };
-  }
-  if (status === 0 || (typeof status === "number" && status >= 500)) {
-    return {
-      message: "The EMR service is temporarily unavailable. Please try again.",
-      requestId,
-    };
-  }
+  // The message is whatever Flask decided (or the neutral `messageForStatus`
+  // fallback when the API was silent); nothing is re-written here.
   return {
     message: apiError?.message || "Something went wrong while loading this information.",
-    requestId,
+    requestId: apiError?.requestId ?? null,
   };
 }
 
 /**
- * Error state with an optional retry. The Flask message is shown when it is
- * safe to render, and the request id is surfaced for support diagnostics.
- * Stack traces and internal exception detail are never shown.
+ * Error state with an optional retry. The Flask message is shown verbatim (the
+ * API only ever emits safe wording), and the request id is surfaced for support
+ * diagnostics. Stack traces and internal exception detail are never shown.
  */
 export function ErrorState({ error, onRetry, title = "Unable to load this information", className }: ErrorStateProps) {
   const { message, requestId } = describe(error);

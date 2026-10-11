@@ -48,7 +48,8 @@ export function LoginForm() {
         const payload = (await response.json().catch(() => null)) as {
           error?: { message?: string };
         } | null;
-        // Always generic: the backend must not confirm whether a user exists.
+        // Flask decides the wording (and never confirms whether a user exists,
+        // so its message is the same either way); render it verbatim.
         setFormError(
           payload?.error?.message ?? "Incorrect username or password.",
         );

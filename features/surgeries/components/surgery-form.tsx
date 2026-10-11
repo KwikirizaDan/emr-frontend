@@ -23,6 +23,7 @@ import { admissionService } from "@/services/admissions/admission-service";
 import { patientService } from "@/services/patients/patient-service";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { isApiError } from "@/services/http/api-error";
+import { can, PERMISSIONS } from "@/lib/permissions";
 import { fromDateTimeLocalValue, toDateTimeLocalValue } from "@/lib/date";
 import type { Patient } from "@/services/http/api-types";
 
@@ -63,7 +64,7 @@ export function SurgeryForm() {
       admission_id: "",
       procedure_name: "",
       procedure_code: "",
-      lead_surgeon_id: user?.role === "SURGEON" ? String(user.id) : "",
+      lead_surgeon_id: can(user, PERMISSIONS.surgeryManage) && user ? String(user.id) : "",
       theatre: "",
       scheduled_start: defaultStart,
       scheduled_end: defaultEnd,
