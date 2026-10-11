@@ -20,6 +20,8 @@ import {
 import { roleLabel } from "@/components/app-shell/app-sidebar";
 import { initials } from "@/lib/formatters";
 import type { CurrentUser } from "@/features/auth/hooks/use-current-user";
+import { isApiError } from "@/services/http/api-error";
+import { bffRequest } from "@/services/http/bff-client";
 
 /** Renders the signed-in identity, or a skeleton while the session is loading. */
 export function NavUser({ user }: { user: CurrentUser | null }) {
@@ -30,16 +32,18 @@ export function NavUser({ user }: { user: CurrentUser | null }) {
   async function signOut() {
     setIsSigningOut(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await bffRequest("/auth/logout", { method: "POST" });
+      toast.success("Signed out", { description: "You have been signed out safely." });
+    } catch (error) {
+      toast.error(
+        isApiError(error)
+          ? error.displayMessage
+          : "Could not confirm sign-out with the server. Please try again.",
+      );
+    } finally {
       router.replace("/login");
       router.refresh();
-    } catch {
-      // The cookie is cleared server-side even when the call fails, so still
-      // return the user to the sign-in screen.
-      router.replace("/login");
-    } finally {
       setIsSigningOut(false);
-      toast.success("Signed out", { description: "You have been signed out safely." });
     }
   }
 

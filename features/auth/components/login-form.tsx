@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField, fieldMessage } from "@/components/shared/form-field";
 import { loginSchema, type LoginFormValues } from "@/features/auth/schemas/login-schema";
+import { bffRequest } from "@/services/http/bff-client";
+import { isApiError } from "@/services/http/api-error";
 
 /** Only same-origin relative paths may be used as a post-login destination. */
 function safeNextPath(value: string | null): string {
@@ -38,29 +40,19 @@ export function LoginForm() {
   async function onSubmit(values: LoginFormValues) {
     setFormError(null);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as {
-          error?: { message?: string };
-        } | null;
-        // Flask decides the wording (and never confirms whether a user exists,
-        // so its message is the same either way); render it verbatim.
-        setFormError(
-          payload?.error?.message ?? "Incorrect username or password.",
-        );
-        return;
-      }
+      await bffRequest("/auth/login", { method: "POST", body: values });
 
       toast.success("Signed in", { description: "Welcome back to the clinical workspace." });
       router.replace(safeNextPath(searchParams.get("next")));
       router.refresh();
-    } catch {
-      setFormError("Unable to reach the EMR service. Check your connection and try again.");
+    } catch (error) {
+      // Flask decides the wording (and never confirms whether a user exists,
+      // so its message is the same either way); render it verbatim.
+      setFormError(
+        isApiError(error)
+          ? error.displayMessage
+          : "Unable to reach the EMR service. Check your connection and try again.",
+      );
     }
   }
 

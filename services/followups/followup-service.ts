@@ -3,7 +3,6 @@
  */
 
 import { getList, getOne, mutateOne } from "@/services/http/list-helpers";
-import { bffRequest } from "@/services/http/bff-client";
 import type { FollowUp, Paginated } from "@/services/http/api-types";
 
 export type FollowUpFilters = {

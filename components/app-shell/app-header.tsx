@@ -1,7 +1,7 @@
 /** Sticky application header holding the sidebar toggle and utility actions. */
 "use client";
 
-import { Bell, HelpCircle, PanelLeft } from "lucide-react";
+import { HelpCircle, PanelLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -27,22 +27,6 @@ export function AppHeader() {
       <Separator orientation="vertical" className="mr-1 h-4" />
 
       <div className="ml-auto flex items-center gap-1">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground"
-                aria-label="Notifications"
-              />
-            }
-          >
-            <Bell className="size-4" />
-          </TooltipTrigger>
-          <TooltipContent>No new notifications</TooltipContent>
-        </Tooltip>
-
         <Tooltip>
           <TooltipTrigger
             render={

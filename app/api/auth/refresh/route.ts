@@ -1,8 +1,6 @@
 /**
  * Route: POST /api/auth/refresh. Re-seals the session cookie in place.
  */
-import type { NextRequest } from "next/server";
-
 import { clearSessionCookie, resolveSession } from "@/lib/auth/server-session";
 
 /**

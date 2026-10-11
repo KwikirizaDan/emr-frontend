@@ -509,6 +509,35 @@ request; the UI must still handle a `403` gracefully.
 - `app/api/[...path]/route.ts` is the only place a `401` triggers a refresh; it
   retries **at most once**.
 
+### Secrets & threat model
+
+**What can reach the browser:** only variables prefixed `NEXT_PUBLIC_`. None are
+configured — `FLASK_API_BASE_URL` and `SESSION_SECRET` are unprefixed, and
+`lib/env.ts` starts with `import "server-only"`, so importing it from a client
+component fails the build instead of bundling the secret.
+
+**What the browser holds:** the `emr_session` cookie — AES-256-GCM ciphertext,
+`httpOnly` (JS cannot read it), `SameSite=Lax`, `Secure` in production. The
+access and refresh tokens live *inside* that ciphertext; the browser never sees a
+bearer token or the Flask base URL.
+
+**What `.env` does and does not protect against:**
+
+- Protects against browser exposure — but that is the prefix rule, not `.env`.
+- Does **not** protect against server-side leakage: a committed `.env` (gitignored
+  here — `.env*` with `!.env.example`), a compromised host, container layers, CI
+  logs or stack traces.
+- `SESSION_SECRET=somedemo-text` in `.env.example` is a placeholder; a weak value
+  weakens the cookie encryption even when nothing leaks.
+
+**Residual browser risks:** XSS does not need the cookie — same-origin script can
+still call `/api/...` as the signed-in user. Mitigate with React's default
+escaping (no `dangerouslySetInnerHTML`) and a CSP, not with `.env`. CSRF is
+mitigated by `SameSite=Lax` plus same-origin JSON requests.
+
+The API's request log records `auth=yes/no` and a request id, never the
+`Authorization` value, so tokens do not reach the console either.
+
 ---
 
 ## 7. Project Q&A (with sample code)

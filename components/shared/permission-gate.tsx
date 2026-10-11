@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Lock } from "lucide-react";
 
-import { can, type Permission, type PermissionSubject } from "@/lib/permissions";
+import { canAll, canAny, type Permission, type PermissionSubject } from "@/lib/permissions";
 import { EmptyState } from "@/components/shared/empty-state";
 
 export type PermissionGateProps = {
@@ -29,10 +29,7 @@ export function PermissionGate({
   fallback = null,
 }: PermissionGateProps) {
   const permissions = Array.isArray(permission) ? permission : [permission];
-  const allowed =
-    mode === "all"
-      ? permissions.every((entry) => can(subject, entry))
-      : permissions.some((entry) => can(subject, entry));
+  const allowed = mode === "all" ? canAll(subject, permissions) : canAny(subject, permissions);
 
   if (allowed) return <>{children}</>;
   return <>{fallback}</>;

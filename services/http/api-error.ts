@@ -1,8 +1,8 @@
 /**
- * Normalised API error.
+ * Normalised backend errors.
  *
- * Every failure surfaced to the UI passes through this type so toasts, inline
- * field errors and support diagnostics have a consistent shape.
+ * Every failure surfaced to the UI passes through this type so forms, toasts,
+ * and support diagnostics share one consistent contract.
  */
 export class ApiError extends Error {
   readonly status: number;
@@ -31,38 +31,11 @@ export class ApiError extends Error {
     this.requestId = requestId;
   }
 
-  get isAuthError(): boolean {
-    return this.status === 401;
-  }
-
-  get isForbidden(): boolean {
-    return this.status === 403;
-  }
-
   get isConflict(): boolean {
     return this.status === 409;
   }
 
-  /** True when the failure carries field-level details we can map onto a form. */
-  get fieldErrors(): Record<string, string> {
-    if (!this.details) return {};
-    const result: Record<string, string> = {};
-    for (const [key, value] of Object.entries(this.details)) {
-      if (typeof value === "string") {
-        result[key] = value;
-      } else if (Array.isArray(value) && typeof value[0] === "string") {
-        result[key] = value[0];
-      }
-    }
-    return result;
-  }
-
-  /**
-   * User-facing message, exactly as Flask decided it. The API's error handler
-   * only ever emits safe wording (e.g. "Invalid username or password.",
-   * "Something went wrong. Quote the request id to support."), so nothing is
-   * rewritten on this side.
-   */
+  /** Message exactly as Flask decided to send it. */
   get displayMessage(): string {
     return this.message;
   }
@@ -72,9 +45,13 @@ export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 /**
- * Human-readable fallback per status code. Used when Flask does not supply a
- * message; raw stack traces and internal exception detail are never shown.
+ * Safe fallback copy used when Flask omits a message.
+ * The API never exposes raw exception details to the browser.
  */
 export function messageForStatus(status: number): string {
   switch (status) {
@@ -106,22 +83,21 @@ export function parseErrorEnvelope(
   body: unknown,
   requestId: string | null = null,
 ): ApiError {
-  const envelope = (body as { error?: Record<string, unknown> } | null)?.error;
-  if (envelope && typeof envelope === "object") {
+  const errorBody = isRecord(body) && isRecord(body.error) ? body.error : null;
+
+  if (errorBody) {
     return new ApiError({
       status,
-      code: typeof envelope.code === "string" ? envelope.code : null,
+      code: typeof errorBody.code === "string" ? errorBody.code : null,
       message:
-        typeof envelope.message === "string" && envelope.message.trim()
-          ? envelope.message
+        typeof errorBody.message === "string" && errorBody.message.trim()
+          ? errorBody.message
           : messageForStatus(status),
-      details:
-        envelope.details && typeof envelope.details === "object"
-          ? (envelope.details as Record<string, unknown>)
-          : null,
+      details: isRecord(errorBody.details) ? errorBody.details : null,
       requestId:
-        typeof envelope.request_id === "string" ? envelope.request_id : requestId,
+        typeof errorBody.request_id === "string" ? errorBody.request_id : requestId,
     });
   }
+
   return new ApiError({ status, message: messageForStatus(status), requestId });
 }

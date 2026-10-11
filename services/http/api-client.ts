@@ -53,29 +53,6 @@ function flaskApi(): AxiosInstance {
   return client;
 }
 
-/** Builds the absolute Flask URL for a documented API path. */
-export function buildFlaskUrl(path: string, query?: Record<string, QueryValue>): string {
-  const base = `${env.flaskApiBaseUrl}${API_BASE_PATH}`;
-  const url = new URL(`${base}${path.startsWith("/") ? path : `/${path}`}`);
-
-  if (query) {
-    for (const [key, value] of Object.entries(query)) {
-      if (value === null || value === undefined || value === "") continue;
-      if (Array.isArray(value)) {
-        for (const item of value) {
-          if (item !== null && item !== undefined && item !== "") {
-            url.searchParams.append(key, String(item));
-          }
-        }
-      } else {
-        url.searchParams.set(key, String(value));
-      }
-    }
-  }
-
-  return url.toString();
-}
-
 /** Serialises a query object, dropping empty values and expanding arrays. */
 function toParams(query?: Record<string, QueryValue>): URLSearchParams | undefined {
   if (!query) return undefined;

@@ -113,7 +113,7 @@ export const NAV_SECTIONS: NavSection[] = [
         title: "Users",
         href: "/users",
         icon: ShieldCheck,
-        permission: PERMISSIONS.userView,
+        permission: PERMISSIONS.userManage,
       },
       {
         title: "Audit logs",

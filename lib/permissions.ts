@@ -49,7 +49,6 @@ export const PERMISSIONS = {
   followupView: "followup:read",
   followupCreate: "followup:create",
   followupManage: "followup:update",
-  userView: "user:manage",
   userManage: "user:manage",
   auditView: "audit:read",
   recycleBinView: "recyclebin:read",
@@ -59,13 +58,13 @@ export const PERMISSIONS = {
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
-const ALL: Permission[] = Object.values(PERMISSIONS);
+const ALL: readonly Permission[] = Object.values(PERMISSIONS);
 
 /**
  * Offline mirror of `ROLE_PERMISSIONS` in `app/permissions.py`. The API's own
  * list always wins in `can()`; this only fills in while it is unavailable.
  */
-const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
+const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   // Administrator is the maximum role: every permission.
   ADMIN: ALL,
   REGISTRAR: [
@@ -142,7 +141,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
 };
 
-export function isRole(value: unknown): value is Role {
+function isRole(value: unknown): value is Role {
   return typeof value === "string" && (ROLES as readonly string[]).includes(value);
 }
 
@@ -151,12 +150,9 @@ export type PermissionSubject = {
   permissions?: readonly string[] | null;
 } | null | undefined;
 
-export function permissionsForRole(role: string | null | undefined): Permission[] {
+function permissionsForRole(role: string | null | undefined): readonly Permission[] {
   return isRole(role) ? ROLE_PERMISSIONS[role] : [];
 }
-
-/** The full permission set that may ever be advertised to the client. */
-export const ALL_PERMISSIONS: readonly Permission[] = ALL;
 
 export function can(subject: PermissionSubject, permission: Permission): boolean {
   if (!subject) return false;
@@ -168,15 +164,10 @@ export function can(subject: PermissionSubject, permission: Permission): boolean
   return permissionsForRole(subject.role).includes(permission);
 }
 
-export function canAny(subject: PermissionSubject, permissions: Permission[]): boolean {
+export function canAny(subject: PermissionSubject, permissions: readonly Permission[]): boolean {
   return permissions.some((permission) => can(subject, permission));
 }
 
-export function canAll(subject: PermissionSubject, permissions: Permission[]): boolean {
+export function canAll(subject: PermissionSubject, permissions: readonly Permission[]): boolean {
   return permissions.every((permission) => can(subject, permission));
-}
-
-export function hasRole(subject: PermissionSubject, ...roles: Role[]): boolean {
-  if (!subject?.role) return false;
-  return roles.includes(subject.role as Role);
 }

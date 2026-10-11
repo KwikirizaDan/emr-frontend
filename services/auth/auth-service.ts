@@ -1,20 +1,20 @@
 ﻿/**
- * Server-only authentication service.
+ * Server-only auth boundary for Flask.
  *
- * Talks to Flask's auth endpoints and normalises raw responses into the
- * encrypted session shape. Token details never reach the browser; the BFF route
- * handlers persist the returned session.
+ * The BFF route handlers talk to this service, which normalises backend payloads
+ * into the encrypted session format used by Next.js. Token details never reach
+ * the browser; only the public user summary is returned.
  */
 import "server-only";
 
-import { ENDPOINTS } from "@/services/http/endpoints";
+import type { SessionPayload, SessionUser } from "@/lib/auth/session";
 import { flaskRequest, type FlaskResponse } from "@/services/http/api-client";
 import {
   ApiError,
   messageForStatus,
   parseErrorEnvelope,
 } from "@/services/http/api-error";
-import type { SessionPayload, SessionUser } from "@/lib/auth/session";
+import { ENDPOINTS } from "@/services/http/endpoints";
 
 /** Login request body expected by `POST /auth/login`. */
 export type LoginInput = {
@@ -22,7 +22,7 @@ export type LoginInput = {
   password: string;
 };
 
-type AuthTokens = {
+type AuthTokenBundle = {
   access_token?: string;
   refresh_token?: string;
   access_token_expires_at?: number | string;
@@ -31,10 +31,11 @@ type AuthTokens = {
 };
 
 /**
- * Raw user shape from Flask. Both the documented snake_case keys and camelCase
- * are accepted so the normaliser keeps working if the schema is renamed.
+ * Raw user payload returned by Flask. Both the documented snake_case keys and
+ * the camelCase variant are accepted so the normaliser stays tolerant to schema
+ * naming changes.
  */
-type RawUser = {
+type ApiUser = {
   id?: string | number;
   username?: string;
   full_name?: string;
@@ -44,153 +45,206 @@ type RawUser = {
   permissions?: string[];
 };
 
-type LoginResponse = AuthTokens & {
-  user?: RawUser;
+type LoginResponseBody = AuthTokenBundle & {
+  user?: ApiUser;
 };
 
-function toSessionUser(raw: RawUser): SessionUser {
-  return {
-    id: String(raw.id ?? ""),
-    username: raw.username ?? "",
-    fullName: raw.full_name ?? raw.fullName ?? raw.username ?? "",
-    email: raw.email ?? null,
-    role: raw.role ?? "",
-    permissions: Array.isArray(raw.permissions) ? raw.permissions : [],
-  };
-}
-
-type RefreshResponse = AuthTokens;
+type RefreshResponseBody = AuthTokenBundle;
 
 export type AuthResult =
   | { ok: true; session: SessionPayload }
   | { ok: false; error: ApiError };
 
-/** Normalises an epoch-seconds, epoch-milliseconds or ISO timestamp to seconds. */
-function coerceExpiry(value: number | string | undefined): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
-    const parsed = Number(value);
-    if (Number.isFinite(parsed)) return parsed;
-    const asDate = Date.parse(value);
-    if (!Number.isNaN(asDate)) return Math.floor(asDate / 1000);
-  }
-  return null;
+function toSessionUser(apiUser: ApiUser): SessionUser {
+  return {
+    id: String(apiUser.id ?? ""),
+    username: apiUser.username ?? "",
+    fullName: apiUser.full_name ?? apiUser.fullName ?? apiUser.username ?? "",
+    email: apiUser.email ?? null,
+    role: apiUser.role ?? "",
+    permissions: Array.isArray(apiUser.permissions) ? apiUser.permissions : [],
+  };
 }
 
 /**
- * Never reveal whether a username exists: every failed sign-in returns the same
- * message from the API regardless of the underlying reason, so the token
- * boundary simply forwards whatever Flask decided.
+ * Normalises a backend expiry value to Unix seconds.
+ * Accepts epoch seconds, epoch milliseconds, and ISO-8601 strings.
  */
-function buildSession(login: LoginResponse): SessionPayload | null {
-  if (!login.access_token || !login.refresh_token) return null;
+function coerceExpiry(value: number | string | undefined): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const numericValue = Number(value);
+    if (Number.isFinite(numericValue)) {
+      return numericValue;
+    }
+
+    const timestampMs = Date.parse(value);
+    if (!Number.isNaN(timestampMs)) {
+      return Math.floor(timestampMs / 1000);
+    }
+  }
+
+  return null;
+}
+
+function resolveAccessTokenExpiry(tokenBundle: AuthTokenBundle): number | null {
+  return (
+    coerceExpiry(tokenBundle.access_token_expires_at) ??
+    (typeof tokenBundle.expires_in === "number"
+      ? Math.floor(Date.now() / 1000) + tokenBundle.expires_in
+      : null)
+  );
+}
+
+function resolveRefreshTokenExpiry(tokenBundle: AuthTokenBundle): number | null {
+  return coerceExpiry(tokenBundle.refresh_token_expires_at);
+}
+
+/**
+ * Flask returns a stable auth failure message regardless of whether the username
+ * exists, so the boundary simply forwards the backend's response.
+ */
+function buildLoginSession(loginResponse: LoginResponseBody): SessionPayload | null {
+  if (!loginResponse.access_token || !loginResponse.refresh_token) {
+    return null;
+  }
 
   return {
-    accessToken: login.access_token,
-    refreshToken: login.refresh_token,
-    accessTokenExpiresAt:
-      coerceExpiry(login.access_token_expires_at) ??
-      (typeof login.expires_in === "number"
-        ? Math.floor(Date.now() / 1000) + login.expires_in
-        : null),
-    refreshTokenExpiresAt: coerceExpiry(login.refresh_token_expires_at),
-    user: toSessionUser(login.user ?? {}),
+    accessToken: loginResponse.access_token,
+    refreshToken: loginResponse.refresh_token,
+    accessTokenExpiresAt: resolveAccessTokenExpiry(loginResponse),
+    refreshTokenExpiresAt: resolveRefreshTokenExpiry(loginResponse),
+    user: toSessionUser(loginResponse.user ?? {}),
   };
 }
 
-/** Builds a session from a refresh response, keeping the already-known user. */
-function refreshSession(refresh: RefreshResponse, previous: SessionPayload): SessionPayload | null {
-  if (!refresh.access_token) return null;
+/** Builds a refreshed session while preserving the previously known user record. */
+function buildRefreshSession(
+  refreshResponse: RefreshResponseBody,
+  previousSession: SessionPayload,
+): SessionPayload | null {
+  if (!refreshResponse.access_token) {
+    return null;
+  }
+
   return {
-    ...previous,
-    accessToken: refresh.access_token,
-    accessTokenExpiresAt:
-      coerceExpiry(refresh.access_token_expires_at) ??
-      (typeof refresh.expires_in === "number"
-        ? Math.floor(Date.now() / 1000) + refresh.expires_in
-        : null),
-    refreshToken: refresh.refresh_token ?? previous.refreshToken,
-    refreshTokenExpiresAt: coerceExpiry(refresh.refresh_token_expires_at),
+    ...previousSession,
+    accessToken: refreshResponse.access_token,
+    accessTokenExpiresAt: resolveAccessTokenExpiry(refreshResponse),
+    refreshToken: refreshResponse.refresh_token ?? previousSession.refreshToken,
+    refreshTokenExpiresAt: resolveRefreshTokenExpiry(refreshResponse),
   };
 }
 
-/** Login, refresh, logout and current-user calls against Flask. */
 export const authService = {
   /** Calls `POST /auth/login` and normalises the response into a session. */
-  async login(input: LoginInput): Promise<AuthResult> {
-    let response: FlaskResponse<LoginResponse>;
+  async login(credentials: LoginInput): Promise<AuthResult> {
+    let loginResponse: FlaskResponse<LoginResponseBody>;
+
     try {
-      response = await flaskRequest<LoginResponse>(ENDPOINTS.auth.login, {
+      loginResponse = await flaskRequest<LoginResponseBody>(ENDPOINTS.auth.login, {
         method: "POST",
-        body: input,
+        body: credentials,
       });
     } catch (error) {
-      // `flaskRequest` throws only when the backend is unreachable; keep that
-      // as the auth failure rather than letting it crash the route handler.
-      if (error instanceof ApiError) return { ok: false, error };
+      if (error instanceof ApiError) {
+        return { ok: false, error };
+      }
       throw error;
     }
 
-    if (!response.ok) {
-      // Flask owns the wording (e.g. "Invalid username or password") and never
-      // confirms whether a username exists, so its message is always the same.
+    if (!loginResponse.ok) {
       return {
         ok: false,
-        error: parseErrorEnvelope(response.status, response.data, response.requestId),
+        error: parseErrorEnvelope(
+          loginResponse.status,
+          loginResponse.data,
+          loginResponse.requestId,
+        ),
       };
     }
 
-    const session = buildSession(response.data ?? {});
+    const session = buildLoginSession(loginResponse.data ?? {});
     if (!session) {
-      return { ok: false, error: new ApiError({ status: 502, message: messageForStatus(502) }) };
+      return {
+        ok: false,
+        error: new ApiError({ status: 502, message: messageForStatus(502) }),
+      };
     }
+
     return { ok: true, session };
   },
 
   /** Rotates the access token using the refresh token stored in the session. */
-  async refresh(session: SessionPayload): Promise<AuthResult> {
-    let response: FlaskResponse<RefreshResponse>;
+  async refresh(currentSession: SessionPayload): Promise<AuthResult> {
+    let refreshResponse: FlaskResponse<RefreshResponseBody>;
+
     try {
-      response = await flaskRequest<RefreshResponse>(ENDPOINTS.auth.refresh, {
+      refreshResponse = await flaskRequest<RefreshResponseBody>(ENDPOINTS.auth.refresh, {
         method: "POST",
-        // Accept either documented shape: bearer refresh token or JSON body.
-        accessToken: session.refreshToken,
-        body: { refresh_token: session.refreshToken },
+        accessToken: currentSession.refreshToken,
+        body: { refresh_token: currentSession.refreshToken },
       });
     } catch (error) {
-      if (error instanceof ApiError) return { ok: false, error };
+      if (error instanceof ApiError) {
+        return { ok: false, error };
+      }
       throw error;
     }
 
-    if (!response.ok) {
-      return { ok: false, error: parseErrorEnvelope(response.status, response.data, response.requestId) };
+    if (!refreshResponse.ok) {
+      return {
+        ok: false,
+        error: parseErrorEnvelope(
+          refreshResponse.status,
+          refreshResponse.data,
+          refreshResponse.requestId,
+        ),
+      };
     }
 
-    const refreshed = refreshSession(response.data ?? {}, session);
-    if (!refreshed) {
-      return { ok: false, error: new ApiError({ status: 502, message: messageForStatus(502) }) };
+    const refreshedSession = buildRefreshSession(refreshResponse.data ?? {}, currentSession);
+    if (!refreshedSession) {
+      return {
+        ok: false,
+        error: new ApiError({ status: 502, message: messageForStatus(502) }),
+      };
     }
-    return { ok: true, session: refreshed };
+
+    return { ok: true, session: refreshedSession };
   },
 
   /** Revokes the refresh token server-side. */
-  async logout(session: SessionPayload): Promise<void> {
-    await flaskRequest(ENDPOINTS.auth.logout, {
+  async logout(currentSession: SessionPayload): Promise<void> {
+    const logoutResponse = await flaskRequest(ENDPOINTS.auth.logout, {
       method: "POST",
-      accessToken: session.accessToken,
-      body: { refresh_token: session.refreshToken },
+      accessToken: currentSession.accessToken,
+      body: { refresh_token: currentSession.refreshToken },
     });
-    // The cookie is cleared by the route handler even if revocation failed, so
-    // the browser is never left holding a session the user asked to end.
+
+    if (!logoutResponse.ok) {
+      throw parseErrorEnvelope(
+        logoutResponse.status,
+        logoutResponse.data,
+        logoutResponse.requestId,
+      );
+    }
+
+    // The route handler clears the cookie even if revocation fails, so the browser
+    // never retains a session the user asked to end.
   },
 
-  /** Loads the current signed-in user with the access token. */
+  /** Fetches the currently signed-in user using the access token. */
   async me(accessToken: string): Promise<SessionUser> {
-    const response = await flaskRequest<RawUser>(ENDPOINTS.auth.me, { accessToken });
-    if (!response.ok) {
-      throw parseErrorEnvelope(response.status, response.data, response.requestId);
+    const userResponse = await flaskRequest<ApiUser>(ENDPOINTS.auth.me, { accessToken });
+
+    if (!userResponse.ok) {
+      throw parseErrorEnvelope(userResponse.status, userResponse.data, userResponse.requestId);
     }
-    return toSessionUser(response.data ?? {});
+
+    return toSessionUser(userResponse.data ?? {});
   },
 };
-

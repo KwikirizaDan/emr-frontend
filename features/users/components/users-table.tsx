@@ -32,7 +32,7 @@ export function UsersTable() {
   const [reasonError, setReasonError] = React.useState<string | null>(null);
   const [deleting, setDeleting] = React.useState(false);
 
-  const canView = can(currentUser, PERMISSIONS.userView);
+  const canView = can(currentUser, PERMISSIONS.userManage);
   const canManage = can(currentUser, PERMISSIONS.userManage);
 
   const { data, error, isLoading, mutate } = useSWR(
