@@ -66,19 +66,8 @@ const ALL: Permission[] = Object.values(PERMISSIONS);
  * list always wins in `can()`; this only fills in while it is unavailable.
  */
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-  ADMIN: [
-    PERMISSIONS.dashboardView,
-    PERMISSIONS.patientView,
-    PERMISSIONS.patientDelete,
-    PERMISSIONS.wardView,
-    PERMISSIONS.wardManage,
-    PERMISSIONS.worklistView,
-    PERMISSIONS.userView,
-    PERMISSIONS.userManage,
-    PERMISSIONS.auditView,
-    PERMISSIONS.recycleBinView,
-    PERMISSIONS.recycleBinRestore,
-  ],
+  // Administrator is the maximum role: every permission.
+  ADMIN: ALL,
   REGISTRAR: [
     PERMISSIONS.dashboardView,
     PERMISSIONS.patientView,
