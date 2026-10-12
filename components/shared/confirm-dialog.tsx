@@ -15,7 +15,6 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FormField } from "@/components/shared/form-field";
 
@@ -114,13 +113,9 @@ export function ConfirmDialog({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction
-            render={
-              <Button
-                variant={destructive ? "destructive" : "default"}
-                disabled={pending}
-                onClick={() => void onConfirm()}
-              />
-            }
+            variant={destructive ? "destructive" : "default"}
+            disabled={pending}
+            onClick={() => void onConfirm()}
           >
             {pending ? (
               <>
