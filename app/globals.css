@@ -18,6 +18,7 @@
     page      #FAFAFA   surface #FFFFFF   border #E5E5E5
 */
 :root {
+    color-scheme: light;
     --background: oklch(0.985 0 0);
     --foreground: oklch(0.205 0 0);
     --card: oklch(1 0 0);
@@ -62,6 +63,7 @@
 }
 
 .dark {
+    color-scheme: dark;
     --background: oklch(0.178 0.006 43);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.232 0.008 43);
@@ -163,5 +165,14 @@
     }
   html {
     @apply font-sans;
+    }
+  /*
+    Native <select> option lists are drawn by the browser, not the DOM, so they
+    need explicit theme tokens. Without this the open list keeps the light
+    system palette (white background) while the control text is the themed
+    foreground, making options hard/ impossible to read in dark mode.
+  */
+  option {
+    @apply bg-popover text-popover-foreground;
     }
 }
