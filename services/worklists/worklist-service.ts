@@ -26,6 +26,7 @@ export const worklistService = {
     });
   },
 
+
   inpatients(page: WorklistPage = {}): Promise<Paginated<InpatientWorklistItem>> {
     return getList<InpatientWorklistItem>("/worklists/inpatients", page);
   },
